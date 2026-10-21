@@ -43,7 +43,8 @@ const REGLAS_COMUNES = [
     nombresArea: {
       backend: ["backend", "back-end", "back end"],
       frontend: ["frontend", "front-end", "front end"],
-      data: ["data", "datos", "analista de datos", "data analyst"],
+      // "datos" solo no cuenta: "bases de datos" no es mencionar el área.
+      data: ["data", "analista de datos", "analisis de datos", "ciencia de datos", "data analyst"],
       uxui: ["ux", "ui", "ux/ui", "experiencia de usuario"]
     },
     mensaje: "Tu perfil es muy corto o genérico: contá en 3 o 4 líneas qué hacés y qué buscás en {area}."
