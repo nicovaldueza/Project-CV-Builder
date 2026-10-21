@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Match Dev — Crítico de CV para Juniors</title>
+  <meta name="description" content="Elegí el área a la que te postulás, cargá tu CV y descubrí qué le falta para Backend, Frontend, Data o UX/UI.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="encabezado">
+    <a class="logo" href="#inicio">Match<span>Dev</span></a>
+  </header>
+
+  <main>
+    <!-- 1. Landing -->
+    <section id="inicio" class="landing" aria-labelledby="titulo-inicio">
+      <h1 id="titulo-inicio">Tu CV, criticado para el puesto que buscás</h1>
+      <p class="landing__bajada">
+        Elegí el área a la que te postulás, cargá tu CV y en segundos ves tu puntaje,
+        qué secciones están flojas y qué te falta para Backend, Frontend, Data o UX/UI.
+      </p>
+      <button type="button" class="boton boton--primario" id="btn-empezar">Empezar</button>
+    </section>
+
+    <!-- 2. Elegir el área -->
+    <section id="area" class="paso" aria-labelledby="titulo-area" hidden>
+      <h2 id="titulo-area">¿A qué área te postulás?</h2>
+      <p class="paso__ayuda">Las reglas de la crítica cambian según el área. Después podés probar con otra.</p>
+      <fieldset class="areas">
+        <legend class="visualmente-oculto">Área de postulación</legend>
+        <label class="area-opcion">
+          <input type="radio" name="area" value="backend">
+          <span class="area-opcion__nombre">Backend</span>
+          <span class="area-opcion__detalle">APIs, bases de datos, servidores</span>
+        </label>
+        <label class="area-opcion">
+          <input type="radio" name="area" value="frontend">
+          <span class="area-opcion__nombre">Frontend</span>
+          <span class="area-opcion__detalle">Interfaces web, HTML, CSS, JavaScript</span>
+        </label>
+        <label class="area-opcion">
+          <input type="radio" name="area" value="data">
+          <span class="area-opcion__nombre">Data</span>
+          <span class="area-opcion__detalle">SQL, dashboards, análisis</span>
+        </label>
+        <label class="area-opcion">
+          <input type="radio" name="area" value="uxui">
+          <span class="area-opcion__nombre">UX/UI</span>
+          <span class="area-opcion__detalle">Investigación, prototipos, Figma</span>
+        </label>
+      </fieldset>
+      <p class="mensaje-error" id="error-area" hidden>Elegí un área para seguir.</p>
+      <button type="button" class="boton boton--primario" id="btn-ir-formulario">Cargar mi CV</button>
+    </section>
+
+    <!-- 3–6. Formulario, vista previa y resultado -->
+    <section id="editor" class="editor" data-modo="edicion" aria-label="Editor de CV" hidden>
+
+      <form id="form-cv" class="editor__form" novalidate>
+        <div class="form-barra">
+          <p>Área: <strong id="area-actual"></strong></p>
+          <button type="button" class="boton boton--texto" id="btn-cambiar-area">Cambiar</button>
+        </div>
+
+        <div class="mensaje-error mensaje-error--bloque" id="error-form" role="alert" hidden></div>
+
+        <!-- Datos + Perfil -->
+        <fieldset class="seccion" id="seccion-perfil">
+          <legend>1. Datos y perfil</legend>
+          <div class="campos campos--2">
+            <div class="campo">
+              <label for="nombre">Nombre y apellido</label>
+              <input id="nombre" data-campo="datos.nombre" type="text" autocomplete="name" required>
+            </div>
+            <div class="campo">
+              <label for="titulo">Título</label>
+              <input id="titulo" data-campo="datos.titulo" type="text" placeholder="Desarrollador Backend Junior" required>
+            </div>
+            <div class="campo">
+              <label for="email">Email</label>
+              <input id="email" data-campo="datos.email" type="email" autocomplete="email" required>
+            </div>
+            <div class="campo">
+              <label for="telefono">Teléfono <span class="opcional">(opcional)</span></label>
+              <input id="telefono" data-campo="datos.telefono" type="tel" autocomplete="tel">
+            </div>
+            <div class="campo campo--ancho">
+              <label for="ubicacion">Ubicación</label>
+              <input id="ubicacion" data-campo="datos.ubicacion" type="text" placeholder="Córdoba, Argentina" required>
+            </div>
+            <div class="campo campo--ancho">
+              <label for="perfil">Perfil</label>
+              <textarea id="perfil" data-campo="perfil" rows="5" aria-describedby="ayuda-perfil" required></textarea>
+              <p class="campo__ayuda" id="ayuda-perfil">En 3 o 4 líneas: qué hacés, qué tecnologías usás y qué buscás.</p>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Experiencia + Educación -->
+        <fieldset class="seccion" id="seccion-experiencia">
+          <legend>2. Experiencia y educación</legend>
+
+          <h3 class="seccion__subtitulo">Experiencia laboral</h3>
+          <label class="check">
+            <input type="checkbox" id="sin-experiencia">
+            Todavía no tengo experiencia laboral
+          </label>
+          <div class="lista" id="lista-experiencias" data-lista="experiencias"></div>
+          <button type="button" class="boton boton--secundario" data-agregar="experiencias">+ Agregar experiencia</button>
+
+          <h3 class="seccion__subtitulo">Educación</h3>
+          <div class="lista" id="lista-educacion" data-lista="educacion"></div>
+          <button type="button" class="boton boton--secundario" data-agregar="educacion">+ Agregar estudio</button>
+        </fieldset>
+
+        <!-- Habilidades -->
+        <fieldset class="seccion" id="seccion-habilidades">
+          <legend>3. Habilidades</legend>
+          <p class="campo__ayuda" id="ayuda-habilidades">Elegí las que manejás. Tienen que aparecer también en tus proyectos para sumar todos los puntos.</p>
+          <div class="habilidades" id="lista-habilidades" role="group" aria-describedby="ayuda-habilidades"></div>
+          <div class="campo">
+            <label for="otras-habilidades">Otras habilidades <span class="opcional">(opcional, no suman puntos)</span></label>
+            <input id="otras-habilidades" data-campo="otrasHabilidades" type="text" placeholder="Trabajo en equipo, Scrum, Inglés intermedio">
+          </div>
+        </fieldset>
+
+        <!-- Proyectos + Links -->
+        <fieldset class="seccion" id="seccion-proyectos">
+          <legend>4. Proyectos y links</legend>
+          <div class="lista" id="lista-proyectos" data-lista="proyectos"></div>
+          <button type="button" class="boton boton--secundario" data-agregar="proyectos">+ Agregar proyecto</button>
+
+          <h3 class="seccion__subtitulo">Links</h3>
+          <p class="campo__ayuda" id="ayuda-links">Completá al menos GitHub o portfolio.</p>
+          <div class="campos campos--2">
+            <div class="campo">
+              <label for="github">GitHub</label>
+              <input id="github" data-campo="links.github" type="url" placeholder="https://github.com/usuario" aria-describedby="ayuda-links">
+            </div>
+            <div class="campo">
+              <label for="portfolio">Portfolio</label>
+              <input id="portfolio" data-campo="links.portfolio" type="url" placeholder="https://..." aria-describedby="ayuda-links">
+            </div>
+            <div class="campo campo--ancho">
+              <label for="linkedin">LinkedIn <span class="opcional">(opcional)</span></label>
+              <input id="linkedin" data-campo="links.linkedin" type="url" placeholder="https://linkedin.com/in/usuario">
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="acciones">
+          <button type="submit" class="boton boton--primario" id="btn-criticar">Criticar mi CV</button>
+          <button type="button" class="boton boton--secundario" id="btn-pdf">Descargar PDF</button>
+        </div>
+      </form>
+
+      <!-- Vista previa: es lo único que se imprime -->
+      <div class="editor__preview">
+        <p class="preview__etiqueta" aria-hidden="true">Vista previa</p>
+        <article id="cv-hoja" class="cv-hoja" aria-label="Vista previa del CV"></article>
+      </div>
+
+      <!-- Resultado de la crítica -->
+      <aside id="resultado" class="editor__resultado" aria-labelledby="titulo-resultado" hidden>
+        <h2 id="titulo-resultado">Resultado</h2>
+        <div aria-live="polite" id="resultado-contenido"></div>
+        <div class="acciones acciones--columna">
+          <button type="button" class="boton boton--primario" id="btn-editar">Corregir mi CV</button>
+          <div class="otra-area">
+            <label for="select-otra-area">Probar con otra área</label>
+            <div class="otra-area__fila">
+              <select id="select-otra-area"></select>
+              <button type="button" class="boton boton--secundario" id="btn-otra-area">Recalcular</button>
+            </div>
+          </div>
+          <button type="button" class="boton boton--texto" id="btn-pdf-resultado">Descargar PDF</button>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <!-- Plantillas de los ítems de las listas -->
+  <template id="tpl-experiencias">
+    <div class="item">
+      <div class="campos campos--2">
+        <div class="campo"><label>Puesto</label><input data-campo="puesto" type="text" required></div>
+        <div class="campo"><label>Empresa</label><input data-campo="empresa" type="text" required></div>
+        <div class="campo"><label>Desde</label><input data-campo="desde" type="month" required></div>
+        <div class="campo"><label>Hasta <span class="opcional">(vacío = actualidad)</span></label><input data-campo="hasta" type="month"></div>
+        <div class="campo campo--ancho"><label>Descripción</label><textarea data-campo="descripcion" rows="3" placeholder="Qué hiciste y qué lograste: 'reduje el tiempo de carga un 30 %'" required></textarea></div>
+      </div>
+      <button type="button" class="boton boton--texto boton--peligro" data-quitar>Quitar</button>
+    </div>
+  </template>
+
+  <template id="tpl-educacion">
+    <div class="item">
+      <div class="campos campos--2">
+        <div class="campo"><label>Título</label><input data-campo="titulo" type="text" required></div>
+        <div class="campo"><label>Institución</label><input data-campo="institucion" type="text" required></div>
+        <div class="campo"><label>Desde</label><input data-campo="desde" type="month" required></div>
+        <div class="campo"><label>Hasta <span class="opcional">(vacío = en curso)</span></label><input data-campo="hasta" type="month"></div>
+      </div>
+      <button type="button" class="boton boton--texto boton--peligro" data-quitar>Quitar</button>
+    </div>
+  </template>
+
+  <template id="tpl-proyectos">
+    <div class="item">
+      <div class="campos campos--2">
+        <div class="campo"><label>Nombre del proyecto</label><input data-campo="nombre" type="text" required></div>
+        <div class="campo"><label>Link</label><input data-campo="link" type="url" placeholder="https://..." required></div>
+        <div class="campo campo--ancho"><label>Tecnologías <span class="opcional">(separadas por coma)</span></label><input data-campo="tecnologias" type="text" placeholder="React, Node.js, PostgreSQL" required></div>
+        <div class="campo campo--ancho"><label>Descripción</label><textarea data-campo="descripcion" rows="3" placeholder="Qué problema resuelve, qué hiciste vos y qué resultado tuvo" required></textarea></div>
+      </div>
+      <button type="button" class="boton boton--texto boton--peligro" data-quitar>Quitar</button>
+    </div>
+  </template>
+
+  <script src="js/reglas.js"></script>
+  <script src="js/critica.js"></script>
+  <script src="js/formulario.js"></script>
+</body>
+</html>
