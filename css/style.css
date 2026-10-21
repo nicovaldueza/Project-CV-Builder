@@ -536,14 +536,6 @@ select:focus-visible {
   font-size: 16px;
 }
 
-.aviso {
-  padding: 12px var(--espacio);
-  border-radius: var(--radio);
-  background: var(--amarillo-fondo);
-  color: var(--amarillo-texto);
-  font-size: 14px;
-}
-
 .puntaje {
   display: flex;
   align-items: center;

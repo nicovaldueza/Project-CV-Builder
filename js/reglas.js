@@ -39,6 +39,13 @@ const REGLAS_COMUNES = [
     descripcion: "Perfil con sustancia",
     puntos: 10,
     minimoPalabras: 40,
+    // Palabras que cuentan como "menciona el área" (además de las habilidades del área).
+    nombresArea: {
+      backend: ["backend", "back-end", "back end"],
+      frontend: ["frontend", "front-end", "front end"],
+      data: ["data", "datos", "analista de datos", "data analyst"],
+      uxui: ["ux", "ui", "ux/ui", "experiencia de usuario"]
+    },
     mensaje: "Tu perfil es muy corto o genérico: contá en 3 o 4 líneas qué hacés y qué buscás en {area}."
   },
   {
@@ -111,6 +118,7 @@ const REGLAS_AREA = {
       seccion: "habilidades",
       descripcion: "HTML, CSS y JavaScript",
       grupos: [["html"], ["css"], ["javascript", "js"]],
+      nombresGrupos: ["HTML", "CSS", "JavaScript"],
       puntos: 15,
       mensaje: "Para Frontend se espera que manejes HTML, CSS y JavaScript."
     },
