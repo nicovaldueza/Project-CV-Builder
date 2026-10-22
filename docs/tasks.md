@@ -44,7 +44,7 @@ Estados: `[ ]` pendiente · `[~]` en progreso · `[x]` completada · `[!]` bloqu
 - [x] Responsive desde 360 px.
 - [x] Botones mínimo 44×44 px.
 - [x] Resultado debajo de vista previa en celular.
-- [~] `@media print`, A4 y solo CV.
+- [x] `@media print`, A4 y solo CV.
 
 ## `formulario.js`
 - [x] Seleccionar área y mostrar habilidades correspondientes.
@@ -62,7 +62,7 @@ Estados: `[ ]` pendiente · `[~]` en progreso · `[x]` completada · `[!]` bloqu
 - [x] Actualizar vista previa sin recargar.
 - [x] Guardar/cargar `localStorage`.
 - [x] Usar `try/catch` para `localStorage`.
-- [~] Preparar impresión.
+- [x] Preparar impresión.
 
 ## `reglas.js`
 ### Comunes — 40 pts
@@ -114,18 +114,18 @@ Estados: `[ ]` pendiente · `[~]` en progreso · `[x]` completada · `[!]` bloqu
 - [x] Recalcular con otra área.
 
 ## Accesibilidad, rendimiento y compatibilidad
-- [~] Recorrido completo con teclado.
+- [x] Recorrido completo con teclado.
 - [x] Foco visible.
 - [x] WCAG AA.
 - [x] Semáforo con color + texto.
 - [x] Errores comprensibles.
 - [x] `aria-live`.
 - [x] `lang="es"` y HTML semántico.
-- [ ] Lighthouse móvil: 90+ Rendimiento.
-- [ ] Lighthouse móvil: 90+ Accesibilidad.
+- [x] Lighthouse móvil: 90+ Rendimiento.
+- [x] Lighthouse móvil: 90+ Accesibilidad.
 - [x] Página <500 KB sin mockup.
 - [x] Inter con `display=swap`.
-- [ ] Chrome/Edge/Firefox/Safari según `specs.md`.
+- [~] Chrome/Edge/Firefox/Safari según `specs.md` (probado en Chromium/Edge; faltan Firefox y Safari).
 
 ## Testing y publicación
 - [x] Recorrido completo.
@@ -135,7 +135,7 @@ Estados: `[ ]` pendiente · `[~]` en progreso · `[x]` completada · `[!]` bloqu
 - [x] `localStorage`.
 - [x] Puntuación/semáforos/mejoras.
 - [x] Cambio de área.
-- [ ] PDF.
+- [~] PDF (hoja A4 verificada con Edge; falta el diálogo de impresión en Chrome).
 - [x] 360 px.
 - [~] Registrar resultados en `testing.md`.
 - [x] Verificar `index.html` en raíz.

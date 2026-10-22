@@ -329,7 +329,8 @@ textarea {
 
 input:focus-visible,
 textarea:focus-visible,
-select:focus-visible {
+select:focus-visible,
+input[type="month"]:focus-within {  /* con el foco en la parte del año, el campo deja de ser :focus */
   outline: 2px solid var(--color-acento);
   outline-offset: 0;
   border-color: var(--color-acento);
@@ -340,7 +341,8 @@ input.invalido,
 textarea.invalido,
 select.invalido,
 input.invalido:focus-visible,
-textarea.invalido:focus-visible {
+textarea.invalido:focus-visible,
+input[type="month"].invalido:focus-within {
   border-color: var(--color-error);
   outline-color: var(--color-error);
 }

@@ -12,11 +12,11 @@ Completar la columna "Resultado" con ✅ / ❌ y la fecha.
 | RF05 | Ver las 4 secciones con color y texto (Bajo / Medio / Bien). | ✅ 20/10 |
 | RF06 | Las mejoras aparecen ordenadas por puntos perdidos, de mayor a menor. | ✅ 20/10 |
 | RF07 | Dejar campos vacíos y criticar: mensaje con la cantidad, campos en rojo, foco en el primero. | ✅ 20/10 |
-| RF08 | "Descargar PDF": la hoja muestra solo el CV, en A4. | |
+| RF08 | "Descargar PDF": la hoja muestra solo el CV, en A4. | ✅ 22/10 (PDF generado con Edge); falta el diálogo en Chrome |
 | RF09 | Completar campos, recargar la página: el CV y el área siguen ahí. | ✅ 20/10 |
 | Otra área | "Probar con otra área": la crítica se recalcula con el mismo CV. | ✅ 20/10 |
 | RNF01 | A 360 px no hay scroll horizontal y el resultado queda debajo de la vista previa. | ✅ 20/10 |
-| RNF02 | Recorrido completo con teclado. Lighthouse celular ≥ 90 en Rendimiento y Accesibilidad. | |
+| RNF02 | Recorrido completo con teclado. Lighthouse celular ≥ 90 en Rendimiento y Accesibilidad. | ✅ 22/10 |
 
 ## Notas del 20/10
 
@@ -31,3 +31,15 @@ Completar la columna "Resultado" con ✅ / ❌ y la fecha.
 - RNF02, peso: ~80 KB con la fuente Inter (límite 500 KB).
 - RNF02, teclado: landing → área (flechas) → formulario funciona con Tab/Enter y el foco se ve. Falta el recorrido completo hasta el resultado.
 - RF06: con un CV que cumple todo (Frontend, 100/100) aparece el mensaje de felicitación.
+
+## Notas del 22/10 (cierre del MVP)
+
+Herramientas: Microsoft Edge (Chromium) en modo headless, Lighthouse 12 y puppeteer, contra `http://localhost:5500`.
+
+- **Lighthouse en celular, portada:** Rendimiento 100, Accesibilidad 100, Buenas prácticas 96 → 100 después de agregar el favicon (el 404 de `/favicon.ico` era el único error de consola), SEO 100.
+- **Lighthouse, accesibilidad por estado:** formulario completo 100; resultado de la crítica 100.
+- **Recorrido completo con teclado (1280 px):** Tab → "Empezar" → áreas con flechas + Espacio → "Cargar mi CV" → 47 paradas de Tab completando todos los campos (texto, email, mes con flechas, casillas de habilidades con Espacio) → Enter en "Criticar mi CV" → el foco va al título del resultado → "Probar con otra área" con flechas + Enter recalcula. Foco visible en todas las paradas.
+- **Corregido:** en los campos de mes, cuando el foco pasaba a la parte del año, se perdía el borde de foco (el campo deja de ser `:focus`). Se usa `:focus-within`.
+- **RF08:** `page.pdf()` con los estilos de impresión da una sola hoja A4 con solo el CV: sin formulario, sin resultado y sin botones, aunque se imprima con el resultado en pantalla. Falta probar el diálogo de impresión en Chrome.
+- **Compatibilidad:** probado en Chromium (Edge y el navegador integrado). Faltan Firefox y Safari.
+
