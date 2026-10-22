@@ -335,8 +335,12 @@ select:focus-visible {
   border-color: var(--color-acento);
 }
 
-.invalido,
-.invalido:focus-visible {
+/* Con tipo de elemento para ganarle a input[type="..."] en especificidad. */
+input.invalido,
+textarea.invalido,
+select.invalido,
+input.invalido:focus-visible,
+textarea.invalido:focus-visible {
   border-color: var(--color-error);
   outline-color: var(--color-error);
 }
@@ -345,6 +349,13 @@ select:focus-visible {
   padding: 8px;
   border: 2px solid var(--color-error);
   border-radius: var(--radio);
+}
+
+.campo__error {
+  margin: 0;
+  color: var(--color-error);
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .mensaje-error {
@@ -482,7 +493,7 @@ select:focus-visible {
 }
 
 .cv__vacio {
-  color: #9CA3AF;
+  color: #6B7280;  /* 4.8:1 sobre blanco */
 }
 
 .cv__bloque {
