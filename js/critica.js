@@ -1,5 +1,5 @@
 // Motor de crítica y panel de resultado.
-// Usa AREAS, SECCIONES, REGLAS_COMUNES y REGLAS_AREA de reglas.js.
+// Usa AREAS, SECCIONES, HABILIDADES, REGLAS_COMUNES, REGLAS_AREA y ORTOGRAFIA de reglas.js.
 
 /*
   Forma del resultado que devuelve criticar(cv) y recibe mostrarResultado():
@@ -13,7 +13,9 @@
       proyectos:   { ... }
     },
     mejoras: [                         // una por regla no cumplida o cumplida a medias
-      { id: "B2", seccion: "habilidades", mensaje: "...", perdidos: 15, pista: "" }
+      { id: "B2", seccion: "habilidades", mensaje: "...", perdidos: 15, pista: "" },
+      { id: "C5-perfil", seccion: "perfil", mensaje: "...", perdidos: 2, pista: "2 errores.",
+        detalles: ["Perfil: «desarollo» → «desarrollo»", "..."] }   // "detalles" solo en ortografía
     ]
   }
 */
@@ -122,6 +124,186 @@ const LOGICA_COMUN = {
   }
 };
 
+// ---------- Ortografía, mayúsculas y puntuación (C5) ----------
+
+const ABREVIATURAS = ["ej", "etc", "aprox", "vs", "p", "dr", "dra", "lic", "ing", "sr", "sra", "nro", "n"];
+const MINUSCULAS_NORMALIZADAS = new Map(ORTOGRAFIA.minusculas.map((p) => [normalizar(p), p]));
+const SIGLAS = new Set(ORTOGRAFIA.siglas);
+const TECNOLOGIAS_MINUSCULA = new Set(ORTOGRAFIA.tecnologias.map((t) => t.toLowerCase()));
+
+const esMayuscula = (letra) => letra !== letra.toLowerCase() && letra === letra.toUpperCase();
+const esMinuscula = (letra) => letra !== letra.toUpperCase() && letra === letra.toLowerCase();
+const conMayuscula = (palabra) => palabra.charAt(0).toUpperCase() + palabra.slice(1);
+const igualarMayuscula = (original, sugerencia) => (esMayuscula(original.charAt(0)) ? conMayuscula(sugerencia) : sugerencia);
+
+// Saca links y emails: no se corrigen. Se reemplazan por "URL" para no dejar espacios dobles.
+function sinUrls(texto) {
+  return String(texto || "")
+    .replace(/https?:\/\/\S+|\S+@\S+\.\S+|\b[\w-]+\.(com|ar|io|dev|net|org|app)(\/\S*)?/gi, "URL");
+}
+
+// ¿La posición está al principio de una oración? Inicio del texto, de una línea (con o sin viñeta)
+// o después de . ! ? seguido de espacio. "Node.js" no corta la oración, ni "ej." u otras abreviaturas.
+function inicioDeOracion(texto, indice) {
+  const antes = texto.slice(0, indice);
+  if (/^[\s\-•*¿¡"«(]*$/u.test(antes)) return true;
+  if (/\n[ \t]*[-•*]?[ \t]*[¿¡"«(]*$/u.test(antes)) return true;
+  const fin = antes.match(/(\p{L}*)[.!?][»")]*\s+[¿¡"«(]*$/u);
+  return Boolean(fin) && !ABREVIATURAS.includes(fin[1].toLowerCase());
+}
+
+// Las primeras palabras de la oración, para mostrar dónde está el error.
+function fragmento(texto, indice) {
+  const oracion = texto.slice(indice).match(/^[^\n]*?([.!?](?=\s|$)|$)/u)[0];
+  return oracion.split(/\s+/).slice(0, 4).join(" ");
+}
+
+/*
+  Revisa un texto y devuelve una lista de errores (strings).
+  tipo: "prosa" (perfil, descripciones), "corto" (títulos, nombres, tecnologías) o "nombre" (nombre, ubicación).
+  opciones.inicio: exige mayúscula al principio. opciones.puntoFinal: exige punto al final.
+*/
+function revisarTexto(textoOriginal, tipo, opciones = {}) {
+  const errores = new Set();
+  const texto = sinUrls(textoOriginal);
+  if (!texto.trim()) return [];
+
+  // Palabra por palabra: errores frecuentes, tildes en -ción/-sión y minúsculas obligatorias.
+  for (const m of texto.matchAll(/\p{L}+/gu)) {
+    const palabra = m[0];
+    const minuscula = palabra.toLowerCase();
+    const normalizada = normalizar(palabra);
+
+    if (tipo !== "nombre" && MINUSCULAS_NORMALIZADAS.has(normalizada) && esMayuscula(palabra.charAt(0)) && !inicioDeOracion(texto, m.index)) {
+      errores.add(`«${palabra}» → «${MINUSCULAS_NORMALIZADAS.get(normalizada)}» (en español, meses, días e idiomas van en minúscula)`);
+    } else if (ORTOGRAFIA.errores[minuscula]) {
+      errores.add(`«${palabra}» → «${igualarMayuscula(palabra, ORTOGRAFIA.errores[minuscula])}»`);
+    } else if (/[cs]ion$/.test(minuscula) && !/ssion$/.test(minuscula) && minuscula.length > 4 && !ORTOGRAFIA.excepcionesIon.includes(minuscula)) {
+      errores.add(`«${palabra}» → «${palabra.slice(0, -3)}${palabra.slice(-3).replace(/[oO]/, (o) => (o === "o" ? "ó" : "Ó"))}» (lleva tilde)`);
+    } else if (/[cs]iónes$/.test(minuscula)) {
+      errores.add(`«${palabra}» → «${palabra.replace(/ó(?=nes$)/i, "o")}» (en plural no lleva tilde)`);
+    }
+  }
+
+  // Nombres de tecnologías mal escritos: "javascript" → "JavaScript".
+  for (const tecnologia of ORTOGRAFIA.tecnologias) {
+    const escapada = tecnologia.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(?<![\\p{L}\\p{N}.])${escapada}(?![\\p{L}\\p{N}])`, "giu");
+    for (const m of texto.matchAll(regex)) {
+      if (m[0] !== tecnologia) errores.add(`«${m[0]}» → «${tecnologia}»`);
+    }
+  }
+
+  // Palabras enteras en mayúsculas (salvo siglas y tecnologías).
+  const enMayusculas = [...texto.matchAll(/\p{L}[\p{L}\p{N}-]*/gu)]
+    .map((m) => m[0])
+    .filter((p) => {
+      const base = p.replace(/\d+$/, "");
+      const letras = base.replace(/[^\p{L}]/gu, "");
+      return letras.length >= 4 && base === base.toUpperCase() && !SIGLAS.has(p) && !SIGLAS.has(base) && !TECNOLOGIAS_MINUSCULA.has(base.toLowerCase());
+    });
+  if (enMayusculas.length) errores.add(`Evitá escribir palabras enteras en mayúsculas: «${[...new Set(enMayusculas)].slice(0, 3).join("», «")}»`);
+
+  // Nombres propios: cada palabra con mayúscula inicial.
+  if (tipo === "nombre") {
+    for (const m of texto.matchAll(/\p{L}+/gu)) {
+      const palabra = m[0];
+      if (esMinuscula(palabra.charAt(0)) && !ORTOGRAFIA.conectoresNombre.includes(palabra)) {
+        errores.add(`«${palabra}» → «${conMayuscula(palabra)}» (los nombres propios van con mayúscula)`);
+      }
+    }
+  }
+
+  // Mayúscula al empezar cada oración (y cada línea).
+  if (tipo === "prosa" || opciones.inicio) {
+    for (const m of texto.matchAll(/\p{L}/gu)) {
+      if (esMinuscula(m[0]) && inicioDeOracion(texto, m.index)) {
+        errores.add(`Empezá con mayúscula: «${fragmento(texto, m.index)}…»`);
+      }
+      if (tipo !== "prosa") break; // en textos cortos solo importa la primera letra
+    }
+  }
+
+  // Espacios.
+  if (/ {2,}/.test(texto)) errores.add("Hay espacios dobles.");
+  for (const m of texto.matchAll(/(\S+) +([,;:!?)]|\.(?![\p{L}\p{N}]))/gu)) {
+    errores.add(`Sobra el espacio antes de «${m[2]}»: «${m[1]} ${m[2]}»`);
+  }
+  for (const m of texto.matchAll(/(\p{L}+)([,;])(\p{L}+)/gu)) {
+    errores.add(`Falta un espacio después de «${m[2]}»: «${m[0]}»`);
+  }
+  for (const m of texto.matchAll(/(\p{Ll}{2,})\.(\p{Lu}\p{Ll}{2,})/gu)) {
+    errores.add(`Falta un espacio después del punto: «${m[0]}»`);
+  }
+
+  // Signos repetidos, signos de apertura y paréntesis.
+  for (const m of texto.matchAll(/([!?¡¿,;:])\1+|(?<!\.)\.\.(?!\.)/g)) {
+    errores.add(`Signo repetido: «${m[0]}»`);
+  }
+  for (const [abre, cierra] of [["¿", "?"], ["¡", "!"]]) {
+    let abierto = false;
+    let anterior = "";
+    for (const caracter of texto) {
+      if (caracter === abre) abierto = true;
+      else if (caracter === cierra && anterior !== cierra) {  // "!!" ya se marca como signo repetido
+        if (!abierto) errores.add(`Falta el signo de apertura «${abre}» (en español se abre y se cierra).`);
+        abierto = false;
+      } else if (caracter === "\n") abierto = false;
+      anterior = caracter;
+    }
+  }
+  const abiertos = (texto.match(/\(/g) || []).length;
+  const cerrados = (texto.match(/\)/g) || []).length;
+  if (abiertos > cerrados) errores.add("Hay un paréntesis sin cerrar.");
+  if (cerrados > abiertos) errores.add("Sobra un paréntesis de cierre.");
+
+  if (opciones.puntoFinal && !/[.!?…)]$/.test(texto.trim())) errores.add("Terminá el texto con un punto.");
+
+  return [...errores];
+}
+
+// Todos los textos del CV que se revisan, agrupados por sección del semáforo.
+function camposParaRevisar(cv) {
+  const campos = { perfil: [], experiencia: [], habilidades: [], proyectos: [] };
+  const agregar = (seccion, lugar, texto, tipo, opciones) => campos[seccion].push({ lugar, texto, tipo, opciones });
+
+  agregar("perfil", "Nombre", cv.datos.nombre, "nombre");
+  agregar("perfil", "Título", cv.datos.titulo, "corto", { inicio: true });
+  agregar("perfil", "Ubicación", cv.datos.ubicacion, "nombre");
+  agregar("perfil", "Perfil", cv.perfil, "prosa", { puntoFinal: true });
+
+  cv.experiencias.forEach((e, i) => {
+    agregar("experiencia", `Experiencia ${i + 1} · puesto`, e.puesto, "corto", { inicio: true });
+    agregar("experiencia", `Experiencia ${i + 1} · empresa`, e.empresa, "corto");
+    agregar("experiencia", `Experiencia ${i + 1} · descripción`, e.descripcion, "prosa");
+  });
+  cv.educacion.forEach((e, i) => {
+    agregar("experiencia", `Educación ${i + 1} · título`, e.titulo, "corto", { inicio: true });
+    agregar("experiencia", `Educación ${i + 1} · institución`, e.institucion, "corto");
+  });
+
+  agregar("habilidades", "Otras habilidades", cv.otrasHabilidades, "corto");
+
+  cv.proyectos.forEach((p, i) => {
+    agregar("proyectos", `Proyecto ${i + 1} · nombre`, p.nombre, "corto");
+    agregar("proyectos", `Proyecto ${i + 1} · tecnologías`, p.tecnologias, "corto");
+    agregar("proyectos", `Proyecto ${i + 1} · descripción`, p.descripcion, "prosa");
+  });
+  return campos;
+}
+
+// C5: cada sección tiene sus puntos; 1 error resta la mitad y 2 o más, todo.
+function evaluarOrtografia(regla, cv) {
+  const campos = camposParaRevisar(cv);
+  return Object.keys(campos).map((seccion) => {
+    const detalles = campos[seccion].flatMap((campo) =>
+      revisarTexto(campo.texto, campo.tipo, campo.opciones).map((error) => `${campo.lugar}: ${error}`)
+    );
+    const obtenidos = detalles.length === 0 ? regla.puntosPorSeccion : detalles.length === 1 ? regla.puntosPorSeccion / 2 : 0;
+    return { seccion, obtenidos, detalles };
+  });
+}
+
 // ---------- Reglas del área (palabras clave) ----------
 
 // 100 % si aparece en habilidades y en proyectos/experiencia, 50 % si en uno solo.
@@ -160,7 +342,7 @@ function criticar(cv) {
   }
 
   const evaluadas = [
-    ...REGLAS_COMUNES.map((regla) => ({ regla, ...LOGICA_COMUN[regla.id](regla, cv) })),
+    ...REGLAS_COMUNES.filter((regla) => LOGICA_COMUN[regla.id]).map((regla) => ({ regla, ...LOGICA_COMUN[regla.id](regla, cv) })),
     ...(REGLAS_AREA[cv.area] || []).map((regla) => ({
       regla,
       ...(regla.grupos ? evaluarGrupos(regla, textos) : evaluarPalabras(regla, textos))
@@ -182,6 +364,25 @@ function criticar(cv) {
         mensaje: regla.mensaje.replace("{area}", AREAS[cv.area]),
         perdidos: regla.puntos - obtenidos,
         pista
+      });
+    }
+  });
+
+  // C5 reparte sus puntos entre las secciones: una mejora por cada sección con errores.
+  const reglaOrtografia = REGLAS_COMUNES.find((regla) => regla.id === "C5");
+  evaluarOrtografia(reglaOrtografia, cv).forEach(({ seccion, obtenidos, detalles }) => {
+    puntaje += obtenidos;
+    secciones[seccion].obtenidos += obtenidos;
+    secciones[seccion].posibles += reglaOrtografia.puntosPorSeccion;
+
+    if (detalles.length) {
+      mejoras.push({
+        id: `C5-${seccion}`,
+        seccion,
+        mensaje: reglaOrtografia.mensaje.replace("{seccion}", SECCIONES[seccion].toLowerCase()),
+        perdidos: reglaOrtografia.puntosPorSeccion - obtenidos,
+        pista: detalles.length === 1 ? "1 error." : `${detalles.length} errores.`,
+        detalles
       });
     }
   });
@@ -221,6 +422,7 @@ function mostrarResultado(resultado, cv) {
           <div>
             <p>${escapar(m.mensaje)}</p>
             ${m.pista ? `<p class="mejora__pista">${escapar(m.pista)}</p>` : ""}
+            ${m.detalles ? `<ul class="mejora__detalles">${m.detalles.map((d) => `<li>${escapar(d)}</li>`).join("")}</ul>` : ""}
             <p class="mejora__seccion">${SECCIONES[m.seccion]}</p>
           </div>
         </li>`).join("")}</ol>`

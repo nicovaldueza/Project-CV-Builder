@@ -1,7 +1,8 @@
 # Match Dev — Especificaciones del Proyecto
 
 > Versión 1 (MVP). Entrega: lunes 26/10/2026.
-> Última actualización: 20/10/2026 (se definieron reglas por área, objeto `cv`, estilo visual, RNF02 y criterios de aceptación).
+> Última actualización: 22/10/2026 (se agregó la regla C5 de ortografía; las reglas comunes pasan a 8 puntos).
+> Antes: 20/10/2026 (reglas por área, objeto `cv`, estilo visual, RNF02 y criterios de aceptación).
 
 ## 1. Descripción general
 
@@ -80,14 +81,26 @@ Perfiles Trainee/Junior que buscan su primer trabajo en Backend, Frontend, Data 
 - Rojo menos de 50, amarillo de 50 a 79, verde 80 o más.
 - El semáforo muestra color **y** texto ("Bajo", "Medio", "Bien"), para no depender solo del color.
 
-#### Reglas comunes (40 puntos)
+#### Reglas comunes (40 puntos: 5 reglas de 8)
 
 | # | Sección | Qué revisa | Puntos | Mensaje si falla |
 | --- | --- | --- | --- | --- |
-| C1 | Proyectos + Links | Hay un link a GitHub, GitLab, Behance, Dribbble o un portfolio (una URL que empiece con `http`). | 10 | "Sumá un link a tu GitHub o portfolio: es lo primero que mira quien te entrevista." |
-| C2 | Datos + Perfil | El perfil tiene al menos 40 palabras (5 pts) y menciona el área o una tecnología de la lista del área (5 pts). | 10 | "Tu perfil es muy corto o genérico: contá en 3 o 4 líneas qué hacés y qué buscás en {área}." |
-| C3 | Proyectos + Links | Cada proyecto tiene un link válido y al menos 2 tecnologías. Puntos proporcionales a los proyectos que cumplen. | 10 | "Agregá a cada proyecto el link y las tecnologías que usaste." |
-| C4 | Experiencia + Educación | Las descripciones de experiencia y proyectos muestran resultados: un número, un `%` o un verbo de logro (logré, reduje, aumenté, mejoré, optimicé, automaticé). 10 pts si la mitad o más lo cumple, 5 pts si al menos una. | 10 | "Contá resultados, no solo tareas: por ejemplo, 'reduje el tiempo de carga un 30 %'." |
+| C1 | Proyectos + Links | Hay un link a GitHub, GitLab, Behance, Dribbble o un portfolio (una URL que empiece con `http`). | 8 | "Sumá un link a tu GitHub o portfolio: es lo primero que mira quien te entrevista." |
+| C2 | Datos + Perfil | El perfil tiene al menos 40 palabras (4 pts) y menciona el área o una tecnología de la lista del área (4 pts). | 8 | "Tu perfil es muy corto o genérico: contá en 3 o 4 líneas qué hacés y qué buscás en {área}." |
+| C3 | Proyectos + Links | Cada proyecto tiene un link válido y al menos 2 tecnologías. Puntos proporcionales a los proyectos que cumplen. | 8 | "Agregá a cada proyecto el link y las tecnologías que usaste." |
+| C4 | Experiencia + Educación | Las descripciones de experiencia y proyectos muestran resultados: un número, un `%` o un verbo de logro (logré, reduje, aumenté, mejoré, optimicé, automaticé). 8 pts si la mitad o más lo cumple, 4 pts si al menos una. | 8 | "Contá resultados, no solo tareas: por ejemplo, 'reduje el tiempo de carga un 30 %'." |
+| C5 | Las 4 secciones (2 pts cada una) | Ortografía, mayúsculas y puntuación (detalle abajo). En cada sección: sin errores 2 pts, 1 error 1 pt, 2 o más 0 pts. | 8 | "Revisá la ortografía y la puntuación en {sección}: un CV con errores se descarta rápido." + la lista de errores con su corrección. |
+
+#### C5: ortografía, mayúsculas y puntuación
+
+Es un crítico de CV: no puede dejar pasar faltas de ortografía. Como el sitio no tiene servidor ni API, no hay un diccionario completo de español (pesaría varios MB); se detectan los errores más comunes con reglas en JavaScript. Los datos están en `ORTOGRAFIA` (`reglas.js`).
+
+- **Qué se revisa:** nombre, título, ubicación, perfil, puesto, empresa y descripción de cada experiencia, título e institución de cada estudio, "Otras habilidades" y nombre, tecnologías y descripción de cada proyecto. Los links y emails se ignoran.
+- **Ortografía:** lista de errores frecuentes en CVs ("desarollo" → "desarrollo", "codigo" → "código"…), palabras terminadas en "-cion"/"-sion" sin tilde ("programacion" → "programación") y plurales con tilde de más ("aplicaciónes"). Se dejaron afuera los verbos que sin tilde también son válidos ("critica", "practico", "publico").
+- **Mayúsculas:** oración o línea que empieza en minúscula (perfil, descripciones, título, puesto y título de estudio); palabras enteras en mayúsculas, salvo siglas (UTN, HTML5…); tecnologías mal escritas ("javascript" → "JavaScript", "github" → "GitHub"); meses, días e idiomas en mayúscula en medio de una oración ("Nivel de Inglés" → "inglés"); nombre y ubicación sin mayúscula inicial.
+- **Puntuación y espacios:** espacios dobles; espacio antes de `,` `.` `;` `:`; falta de espacio después de `,` `;` o del punto ("carga.Busco"); signos repetidos ("!!", ",,"); falta de "¿" o "¡"; paréntesis sin cerrar; perfil sin punto final.
+- **Mejoras:** una por sección con errores, con la lista de cada error, dónde está y cómo corregirlo (por ejemplo, "Proyecto 1 · tecnologías: «javascript» → «JavaScript»").
+- **Límite:** no detecta palabras mal escritas que no estén en la lista ni errores de concordancia o de tildes diacríticas (tú/tu, más/mas, sí/si).
 
 #### Reglas por área (60 puntos)
 

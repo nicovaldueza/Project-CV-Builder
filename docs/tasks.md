@@ -65,11 +65,12 @@ Estados: `[ ]` pendiente · `[~]` en progreso · `[x]` completada · `[!]` bloqu
 - [x] Preparar impresión.
 
 ## `reglas.js`
-### Comunes — 40 pts
-- [x] C1 GitHub/GitLab/Behance/Dribbble/portfolio — 10.
-- [x] C2 Perfil ≥40 palabras + área/tecnología — 10.
-- [x] C3 Proyectos con link + ≥2 tecnologías — 10.
-- [x] C4 Resultados concretos — 10.
+### Comunes — 40 pts (5 reglas de 8)
+- [x] C1 GitHub/GitLab/Behance/Dribbble/portfolio — 8.
+- [x] C2 Perfil ≥40 palabras + área/tecnología — 8.
+- [x] C3 Proyectos con link + ≥2 tecnologías — 8.
+- [x] C4 Resultados concretos — 8.
+- [x] C5 Ortografía, mayúsculas y puntuación — 8 (2 por sección).
 
 ### Backend — 60 pts
 - [x] B1 Lenguaje backend — 15.

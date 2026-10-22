@@ -11,6 +11,7 @@ Completar la columna "Resultado" con ✅ / ❌ y la fecha.
 | RF04 | CV que cumple todas las reglas → 100. CV que no cumple ninguna → 0. | ✅ 20/10 |
 | RF05 | Ver las 4 secciones con color y texto (Bajo / Medio / Bien). | ✅ 20/10 |
 | RF06 | Las mejoras aparecen ordenadas por puntos perdidos, de mayor a menor. | ✅ 20/10 |
+| C5 | CV con faltas de ortografía, mayúsculas y puntuación: cada error aparece en su sección con la corrección; un CV bien escrito no tiene marcas. | ✅ 22/10 |
 | RF07 | Dejar campos vacíos y criticar: mensaje con la cantidad, campos en rojo, foco en el primero. | ✅ 20/10 |
 | RF08 | "Descargar PDF": la hoja muestra solo el CV, en A4. | ✅ 22/10 (PDF generado con Edge); falta el diálogo en Chrome |
 | RF09 | Completar campos, recargar la página: el CV y el área siguen ahí. | ✅ 20/10 |
@@ -43,3 +44,8 @@ Herramientas: Microsoft Edge (Chromium) en modo headless, Lighthouse 12 y puppet
 - **RF08:** `page.pdf()` con los estilos de impresión da una sola hoja A4 con solo el CV: sin formulario, sin resultado y sin botones, aunque se imprima con el resultado en pantalla. Falta probar el diálogo de impresión en Chrome.
 - **Compatibilidad:** probado en Chromium (Edge y el navegador integrado). Faltan Firefox y Safari.
 
+## Notas del 22/10 (ortografía, C5)
+
+- Script del motor: 49 casos OK. Incluye CV completo y bien escrito = 100 en las 4 áreas, los puntajes nuevos de C1–C4 (8 pts) y 26 casos de `revisarTexto`: errores frecuentes, tildes en -ción, plurales, tecnologías, idiomas en minúscula, mayúsculas sostenidas, siglas, inicio de oración, viñetas, abreviaturas ("ej."), espacios, signos repetidos, "¿"/"¡", paréntesis, punto final, nombres propios y links/emails ignorados.
+- Falsos positivos: 17 textos de CV bien escritos (perfiles, descripciones con viñetas, títulos, tecnologías, nombres con "del", "Node.js", "ASP.NET", "UX/UI", "CI/CD") → ninguna marca indebida.
+- Navegador: CV de prueba con errores (Frontend) → 74/100 y 20 errores detectados, cada uno en su sección y con su corrección.

@@ -128,3 +128,4 @@ Los resultados reales deben quedar en `testing.md`.
 - Agregado el favicon (`assets/favicon.svg`): su 404 era el único error de consola.
 - Corregido el borde de foco de los campos de mes cuando el foco pasa a la parte del año.
 
+- **Ortografía (C5):** el crítico ya no deja pasar faltas de ortografía, mayúsculas mal puestas ni errores de puntuación. Es una nueva regla común de 8 puntos (2 por sección); las comunes pasan de 4 × 10 a 5 × 8 y siguen sumando 40. Cada error aparece en las mejoras con su ubicación y la corrección.
