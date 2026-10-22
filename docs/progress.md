@@ -16,7 +16,7 @@
 - [x] Incorporar `tasks.md`.
 - [x] Incorporar `design.md`.
 - [x] Incorporar `progress.md`.
-- [~] Completar resultados reales en `testing.md` (faltan RF08 y Lighthouse).
+- [~] Completar resultados reales en `testing.md` (falta el diálogo de impresión en Chrome, Firefox y Safari).
 - [x] Mantener `README.md`.
 
 ## Estructura observada del repositorio
@@ -70,7 +70,7 @@ Implementada en los PR #2 (estructura base y motor de crítica) y en el PR de es
 - [x] Diseño visual.
 - [x] Responsive.
 - [x] Focus/error.
-- [~] Impresión: `@media print` hecho, falta probar en Chrome.
+- [x] Impresión: hoja A4 con solo el CV, verificada con Edge.
 
 ### JavaScript
 - [x] `formulario.js`.
@@ -90,12 +90,12 @@ Implementada en los PR #2 (estructura base y motor de crítica) y en el PR de es
 - [x] RF05 semáforo.
 - [x] RF06 mejoras.
 - [x] RF07 validación.
-- [ ] RF08 PDF.
+- [~] RF08 PDF: hoja verificada con Edge; falta el diálogo en Chrome.
 - [x] RF09 persistencia.
 - [x] Responsive 360 px.
-- [~] Accesibilidad: contraste AA medido y recorrido inicial con teclado OK; falta Lighthouse y recorrido completo.
-- [~] Rendimiento: ~80 KB con la fuente (límite 500 KB); falta Lighthouse.
-- [ ] Compatibilidad: probado solo en Chromium.
+- [x] Accesibilidad: Lighthouse 100 en portada, formulario y resultado; recorrido completo con teclado; contraste AA.
+- [x] Rendimiento: Lighthouse móvil 100; ~80 KB con la fuente (límite 500 KB).
+- [~] Compatibilidad: probado en Chromium (Edge); faltan Firefox y Safari.
 
 Los resultados reales deben quedar en `testing.md`.
 
@@ -107,13 +107,11 @@ Los resultados reales deben quedar en `testing.md`.
 - [ ] Revisar consola.
 
 ## Próximos pasos
-1. Probar "Descargar PDF" en Chrome (RF08).
-2. Correr Lighthouse en celular (Rendimiento y Accesibilidad).
-3. Recorrido completo solo con teclado.
-4. Probar en Firefox y Safari.
-5. **Sábado 24/10:** hacer público el repo (en el plan Free, Pages no funciona con repos privados), activar GitHub Pages y probar la URL publicada.
-6. Registrar resultados en `testing.md`.
-7. Preparar entrega y defensa.
+1. Probar "Descargar PDF" con el diálogo de impresión de Chrome (RF08).
+2. Probar en Firefox y Safari.
+3. **Sábado 24/10:** hacer público el repo (en el plan Free, Pages no funciona con repos privados), activar GitHub Pages y probar la URL publicada.
+4. Registrar resultados en `testing.md`.
+5. Preparar entrega y defensa.
 
 ## Registro de cambios
 ### 21/10/2026
@@ -126,3 +124,7 @@ Los resultados reales deben quedar en `testing.md`.
 - Cada campo con error muestra su propio mensaje, vinculado con `aria-describedby` (antes había solo un aviso general).
 - Corregido: el borde rojo de error no se veía en los `<input>`, solo en los `<textarea>`.
 - Corregido: el texto de ejemplo de la vista previa ("Tu nombre") no llegaba a contraste AA; pasó de `#9CA3AF` a `#6B7280`.
+- Cierre del MVP: Lighthouse móvil 100 en Rendimiento y Accesibilidad (portada, formulario y resultado), recorrido completo con teclado y PDF verificado con Edge.
+- Agregado el favicon (`assets/favicon.svg`): su 404 era el único error de consola.
+- Corregido el borde de foco de los campos de mes cuando el foco pasa a la parte del año.
+
