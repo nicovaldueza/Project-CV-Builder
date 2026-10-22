@@ -6,6 +6,11 @@ const CLAVE_STORAGE = "matchdev-cv";
 // Textos de la interfaz que arma JavaScript (para traducir en la v2).
 const TEXTOS = {
   faltanCampos: (n) => n === 1 ? "Falta completar 1 campo." : `Faltan completar ${n} campos.`,
+  errorVacio: "Completá este campo.",
+  errorEmail: "Escribí un email válido, por ejemplo nombre@mail.com.",
+  errorUrl: "Escribí un link completo, que empiece con https://",
+  errorLinks: "Falta un link: con GitHub o portfolio alcanza.",
+  errorHabilidades: "Elegí al menos una habilidad.",
   actualidad: "Actualidad",
   enCurso: "En curso",
   placeholderNombre: "Tu nombre",
@@ -241,19 +246,54 @@ function renderPreview() {
 
 // ---------- Validación (RF07) ----------
 
-function marcar(campo, invalido) {
+// Agrega o saca un id de aria-describedby sin pisar los que ya tiene (ej. el texto de ayuda).
+function alternarDescripcion(campo, id, agregar) {
+  const ids = (campo.getAttribute("aria-describedby") || "").split(" ").filter((i) => i && i !== id);
+  if (agregar) ids.push(id);
+  if (ids.length) campo.setAttribute("aria-describedby", ids.join(" "));
+  else campo.removeAttribute("aria-describedby");
+}
+
+// Marca el campo en rojo y le pone su mensaje de error, vinculado con aria-describedby.
+function marcar(campo, invalido, mensaje = "") {
+  const idError = `${campo.id}-error`;
+  let error = document.getElementById(idError);
+
   campo.classList.toggle("invalido", invalido);
   if (invalido) campo.setAttribute("aria-invalid", "true");
   else campo.removeAttribute("aria-invalid");
+
+  if (invalido) {
+    if (!error) {
+      error = document.createElement("p");
+      error.className = "campo__error";
+      error.id = idError;
+      campo.insertAdjacentElement("afterend", error);
+    }
+    error.textContent = mensaje;
+  } else if (error) {
+    error.remove();
+  }
+  alternarDescripcion(campo, idError, invalido);
+}
+
+function mensajeError(campo) {
+  if (!campo.value.trim()) return TEXTOS.errorVacio;
+  if (campo.type === "email") return TEXTOS.errorEmail;
+  if (campo.type === "url") return TEXTOS.errorUrl;
+  return TEXTOS.errorVacio;
+}
+
+function campoValido(campo) {
+  return campo.value.trim() !== "" && campo.checkValidity();
 }
 
 function validar() {
   const invalidos = [];
 
   form.querySelectorAll("[required]").forEach((campo) => {
-    if (campo.closest("[hidden]")) return;
-    const malo = !campo.value.trim() || !campo.checkValidity();
-    marcar(campo, malo);
+    const malo = !campo.closest("[hidden]") && !campoValido(campo);
+    marcar(campo, malo, malo ? mensajeError(campo) : "");
     if (malo) invalidos.push(campo);
   });
 
@@ -263,14 +303,14 @@ function validar() {
   const sinLinks = !github.value.trim() && !portfolio.value.trim();
   [github, portfolio].forEach((campo) => {
     const malo = sinLinks || (campo.value.trim() !== "" && !campo.checkValidity());
-    marcar(campo, malo);
+    marcar(campo, malo, sinLinks ? TEXTOS.errorLinks : TEXTOS.errorUrl);
     if (malo) invalidos.push(campo);
   });
 
   // Habilidades: al menos una elegida.
   const grupoHabilidades = document.getElementById("lista-habilidades");
   const sinHabilidades = cv.habilidades.length === 0;
-  marcar(grupoHabilidades, sinHabilidades);
+  marcar(grupoHabilidades, sinHabilidades, TEXTOS.errorHabilidades);
   if (sinHabilidades) invalidos.push(grupoHabilidades.querySelector("input") || grupoHabilidades);
 
   // Ordenados como aparecen en la página, para ir al primero.
@@ -354,7 +394,16 @@ form.addEventListener("input", (e) => {
   cv = leerFormulario();
   renderPreview();
   guardar();
-  if (e.target.classList.contains("invalido") && e.target.value.trim()) marcar(e.target, false);
+  if (e.target.classList.contains("invalido") && campoValido(e.target)) marcar(e.target, false);
+
+  // Con un link válido en GitHub o portfolio, el otro deja de ser obligatorio.
+  if (["github", "portfolio"].includes(e.target.id) && campoValido(e.target)) {
+    ["github", "portfolio"].forEach((id) => {
+      const otro = document.getElementById(id);
+      if (otro.classList.contains("invalido") && !otro.value.trim()) marcar(otro, false);
+    });
+  }
+
   if (e.target.name === "habilidad" && cv.habilidades.length) marcar(document.getElementById("lista-habilidades"), false);
 });
 

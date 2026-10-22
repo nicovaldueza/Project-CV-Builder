@@ -23,3 +23,11 @@ Completar la columna "Resultado" con ✅ / ❌ y la fecha.
 - RF04–RF06 se verificaron además con un script que carga `reglas.js` y `critica.js` en Node: CV completo da 100 en las 4 áreas, CV vacío da 0, la detección por palabra completa (`java` ≠ `javascript`), el 50 % cuando una palabra aparece en un solo lugar, F1 por grupos, C2–C4 y el orden de las mejoras.
 - Caso real en el navegador (Backend, CV de prueba "Ana Pérez"): 80/100, con las secciones en 50 / 100 / 80 / 83, que coincide con el cálculo a mano.
 - Pendientes: RF08 (probar la impresión en Chrome) y RNF02 (correr Lighthouse).
+
+## Notas del 22/10
+
+- RF07: cada campo con error muestra su mensaje ("Completá este campo.", email o link inválido, "Falta un link…", "Elegí al menos una habilidad.") vinculado con `aria-describedby`, sin pisar el texto de ayuda. El mensaje se va al corregir el campo. Se corrigió que el borde rojo no se veía en los `<input>`.
+- RNF02, contraste: medido con la fórmula de WCAG para todos los pares de colores de la paleta; todos ≥ 4.5:1. El texto de ejemplo de la vista previa estaba en 2.5:1 y se corrigió a 4.8:1.
+- RNF02, peso: ~80 KB con la fuente Inter (límite 500 KB).
+- RNF02, teclado: landing → área (flechas) → formulario funciona con Tab/Enter y el foco se ve. Falta el recorrido completo hasta el resultado.
+- RF06: con un CV que cumple todo (Frontend, 100/100) aparece el mensaje de felicitación.
