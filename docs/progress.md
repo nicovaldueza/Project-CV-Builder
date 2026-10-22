@@ -4,6 +4,7 @@
 **Proyecto:** Match Dev  
 **Versión:** MVP v1  
 **Entrega:** lunes 26/10/2026  
+**Producción (GitHub Pages):** sábado 24/10/2026, como límite. Hasta entonces se trabaja en desarrollo.  
 **Última actualización de `specs.md`:** 20/10/2026  
 **Última actualización de este archivo:** 22/10/2026
 
@@ -110,7 +111,7 @@ Los resultados reales deben quedar en `testing.md`.
 2. Correr Lighthouse en celular (Rendimiento y Accesibilidad).
 3. Recorrido completo solo con teclado.
 4. Probar en Firefox y Safari.
-5. Activar GitHub Pages y probar la URL publicada.
+5. **Sábado 24/10:** hacer público el repo (en el plan Free, Pages no funciona con repos privados), activar GitHub Pages y probar la URL publicada.
 6. Registrar resultados en `testing.md`.
 7. Preparar entrega y defensa.
 
