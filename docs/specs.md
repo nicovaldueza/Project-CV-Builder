@@ -47,6 +47,7 @@ Perfiles Trainee/Junior que buscan su primer trabajo en Backend, Frontend, Data 
 | RF08 | Descargar el CV en PDF (solo el CV, sin la crítica), usando la impresión del navegador. | Media |
 | RF09 | Guardar el CV automáticamente en localStorage cada vez que cambia un campo. | Alta |
 | RF10 | Cambiar el idioma (español / inglés) de la página, el CV y la crítica. | Baja (v2) |
+| RF11 | Empezar un CV nuevo desde cero (borra el CV guardado), con confirmación. Disponible en la portada (si hay un CV guardado), en el formulario y en el resultado. | Media |
 
 ### Habilidades
 
@@ -312,6 +313,7 @@ Si sobra tiempo, se hace primero el tono elegible.
 | RF09 | Si completo campos y recargo la página o la cierro y la vuelvo a abrir, veo el CV y el área como los dejé. |
 | RF10 (v2) | Si cambio el idioma, la página, el CV y la crítica pasan a inglés y la elección se mantiene al recargar. |
 | Cambiar de área | Si aprieto "Probar con otra área" y elijo otra, veo la crítica recalculada con el mismo CV, sin volver a cargar nada. |
+| RF11 | Si tengo un CV guardado, la portada dice "Continuar mi CV" y ofrece "Empezar uno nuevo". Si aprieto "Empezar un CV nuevo" (portada, formulario o resultado), veo una confirmación con el foco en "Cancelar"; si cancelo (o aprieto Esc), no cambia nada; si confirmo, el CV queda vacío en pantalla y en localStorage. Desde el formulario o el resultado se mantiene el área y vuelvo al paso 1; desde la portada vuelvo a elegir el área. |
 | RNF01 | A 360 px de ancho no hay scroll horizontal, los botones se pueden tocar (mínimo 44 × 44 px) y el resultado aparece debajo de la vista previa. |
 | RNF02 | Puedo completar todo el recorrido solo con teclado; Lighthouse en celular da 90 o más en Rendimiento y Accesibilidad; la página funciona en Chrome, Edge, Firefox y Safari actuales. |
 

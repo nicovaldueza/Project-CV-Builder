@@ -18,6 +18,7 @@ Completar la columna "Resultado" con ✅ / ❌ y la fecha.
 | RF08 | "Descargar PDF": la hoja muestra solo el CV, en A4. | ✅ 22/10 (PDF generado con Edge); falta el diálogo en Chrome |
 | RF09 | Completar campos, recargar la página: el CV y el área siguen ahí. | ✅ 20/10 |
 | Otra área | "Probar con otra área": la crítica se recalcula con el mismo CV. | ✅ 20/10 |
+| RF11 | Con un CV guardado: la portada dice "Continuar mi CV" y muestra "Empezar uno nuevo". Cancelar y Esc no cambian nada. Confirmar desde el formulario y desde el resultado vacía el CV (pantalla, vista previa y localStorage), mantiene el área y vuelve al paso 1 con la barra reiniciada; desde la portada vuelve a elegir área. | ✅ 23/10 |
 | RNF01 | A 360 px no hay scroll horizontal y el resultado queda debajo de la vista previa. | ✅ 20/10 |
 | RNF02 | Recorrido completo con teclado. Lighthouse celular ≥ 90 en Rendimiento y Accesibilidad. | ✅ 22/10 |
 

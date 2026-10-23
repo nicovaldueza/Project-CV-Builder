@@ -17,6 +17,8 @@ const TEXTOS = {
   errorLinks: "Falta un link: con GitHub o portfolio alcanza.",
   errorHabilidades: "Elegí al menos una habilidad.",
   revisando: "Revisando ortografía…",
+  empezar: "Empezar",
+  continuarCv: "Continuar mi CV",
   ejemploTitulo: {
     backend: "Desarrollador/a Backend Junior",
     frontend: "Desarrollador/a Frontend Junior",
@@ -490,13 +492,74 @@ function imprimir() {
   window.print();
 }
 
+// ---------- Empezar un CV nuevo ----------
+
+// ¿Hay algo cargado? Sirve para ofrecer "Continuar mi CV" en la portada.
+function tieneDatos(c) {
+  const textos = [
+    ...Object.values(c.datos), c.perfil, c.otrasHabilidades, ...Object.values(c.links),
+    ...[...c.experiencias, ...c.educacion, ...c.proyectos].flatMap(Object.values)
+  ];
+  return c.habilidades.length > 0 || textos.some((texto) => String(texto || "").trim());
+}
+
+function actualizarPortada() {
+  const hayCv = tieneDatos(cv);
+  document.getElementById("btn-empezar").textContent = hayCv ? TEXTOS.continuarCv : TEXTOS.empezar;
+  document.getElementById("btn-nuevo-landing").hidden = !hayCv;
+}
+
+const dialogoNuevo = document.getElementById("dialogo-nuevo");
+let nuevoDesdePortada = false;
+
+// Borra el CV guardado. Desde el editor se mantiene el área y se vuelve al paso 1;
+// desde la portada se vuelve a elegir el área.
+function empezarDeCero() {
+  const area = nuevoDesdePortada ? "" : cv.area;
+  cv = cvVacio();
+  cv.area = area;
+  guardar();
+  escribirFormulario();
+  form.querySelectorAll(".invalido").forEach((campo) => marcar(campo, false));
+  renderPreview();
+  pasoMaximo = 0;
+  actualizarPortada();
+
+  if (nuevoDesdePortada) {
+    document.querySelectorAll('input[name="area"]').forEach((radio) => { radio.checked = false; });
+    irA("area");
+  } else {
+    modoEditor("edicion");
+    irAPaso(0);
+  }
+}
+
 // ---------- Eventos ----------
 
 document.getElementById("btn-empezar").addEventListener("click", () => irA("area"));
 
 document.querySelector(".logo").addEventListener("click", (e) => {
   e.preventDefault();
+  actualizarPortada();
   irA("inicio");
+});
+
+document.querySelectorAll("[data-nuevo-cv]").forEach((boton) => {
+  boton.addEventListener("click", () => {
+    nuevoDesdePortada = boton.id === "btn-nuevo-landing";
+    dialogoNuevo.showModal();
+  });
+});
+document.getElementById("btn-nuevo-cancelar").addEventListener("click", () => dialogoNuevo.close());
+document.getElementById("btn-nuevo-confirmar").addEventListener("click", () => {
+  dialogoNuevo.close();
+  empezarDeCero();
+});
+// Clic afuera del cuadro (en el fondo oscuro): se cancela.
+dialogoNuevo.addEventListener("click", (e) => {
+  const r = dialogoNuevo.getBoundingClientRect();
+  const afuera = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+  if (e.target === dialogoNuevo && afuera) dialogoNuevo.close();
 });
 
 document.getElementById("btn-ir-formulario").addEventListener("click", () => {
@@ -605,4 +668,5 @@ document.getElementById("btn-pdf-resultado").addEventListener("click", imprimir)
   const primeroIncompleto = pasos.findIndex((_, i) => erroresDelPaso(i).length);
   pasoMaximo = primeroIncompleto === -1 ? ULTIMO_PASO : primeroIncompleto;
   irAPaso(0, { enfocar: false });
+  actualizarPortada();
 })();

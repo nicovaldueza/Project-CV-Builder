@@ -55,6 +55,10 @@ RESULTADO
 ## 5. Landing
 Debe explicar qué es Match Dev, para quién está pensado y qué problema resuelve. Debe incluir “Empezar”.
 
+Si hay un CV guardado, el botón dice “Continuar mi CV” y aparece al lado “Empezar uno nuevo” (secundario).
+
+**Empezar un CV nuevo** (portada, barra del formulario y resultado): abre un diálogo de confirmación (`<dialog>` modal) con “Cancelar” (con el foco al abrir) y “Sí, empezar de cero” en rojo (`--color-error`). Se cierra con Esc o con un clic en el fondo.
+
 ## 6. Selección de área
 Backend, Frontend, Data y UX/UI. La seleccionada queda marcada. Se muestran las habilidades del área. Sin área seleccionada no se avanza.
 

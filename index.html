@@ -24,7 +24,10 @@
         Elegí el área a la que te postulás, cargá tu CV y en segundos ves tu puntaje,
         qué secciones están flojas y qué te falta para Backend, Frontend, Data o UX/UI.
       </p>
-      <button type="button" class="boton boton--primario" id="btn-empezar">Empezar</button>
+      <div class="landing__acciones">
+        <button type="button" class="boton boton--primario" id="btn-empezar">Empezar</button>
+        <button type="button" class="boton boton--secundario" id="btn-nuevo-landing" data-nuevo-cv hidden>Empezar uno nuevo</button>
+      </div>
     </section>
 
     <!-- 2. Elegir el área -->
@@ -65,6 +68,7 @@
         <div class="form-barra">
           <p>Área: <strong id="area-actual"></strong></p>
           <button type="button" class="boton boton--texto" id="btn-cambiar-area">Cambiar</button>
+          <button type="button" class="boton boton--texto boton--peligro form-barra__nuevo" data-nuevo-cv>Empezar un CV nuevo</button>
         </div>
 
         <!-- Barra de pasos: se puede saltar a cualquier paso ya alcanzado -->
@@ -192,12 +196,23 @@
             </div>
           </div>
           <button type="button" class="boton boton--texto" id="btn-pdf-resultado">Descargar PDF</button>
+          <button type="button" class="boton boton--texto boton--peligro" data-nuevo-cv>Empezar un CV nuevo</button>
         </div>
       </aside>
     </section>
   </main>
 
   <!-- Plantillas de los ítems de las listas -->
+  <!-- Confirmación antes de borrar el CV guardado -->
+  <dialog id="dialogo-nuevo" class="dialogo" aria-labelledby="dialogo-nuevo-titulo" aria-describedby="dialogo-nuevo-texto">
+    <h2 id="dialogo-nuevo-titulo">¿Empezar un CV nuevo?</h2>
+    <p id="dialogo-nuevo-texto">Se borra todo lo que cargaste en este navegador y no se puede deshacer. Si querés guardarlo, descargá el PDF antes.</p>
+    <div class="acciones">
+      <button type="button" class="boton boton--secundario" id="btn-nuevo-cancelar" autofocus>Cancelar</button>
+      <button type="button" class="boton boton--peligro-solido" id="btn-nuevo-confirmar">Sí, empezar de cero</button>
+    </div>
+  </dialog>
+
   <template id="tpl-experiencias">
     <div class="item">
       <div class="campos campos--2">
