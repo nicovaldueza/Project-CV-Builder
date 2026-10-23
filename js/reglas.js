@@ -24,20 +24,20 @@ const HABILIDADES = {
   uxui: ["Figma", "Adobe XD", "Penpot", "Wireframes", "Prototipos", "User Research", "Tests de usabilidad", "Design System", "Accesibilidad", "HTML", "CSS", "Illustrator", "Photoshop"]
 };
 
-// Reglas comunes (40 puntos). La lógica de cada una está en critica.js, por su id.
+// Reglas comunes (40 puntos: 5 reglas de 8). La lógica de cada una está en critica.js, por su id.
 const REGLAS_COMUNES = [
   {
     id: "C1",
     seccion: "proyectos",
     descripcion: "Link a GitHub o portfolio",
-    puntos: 10,
+    puntos: 8,
     mensaje: "Sumá un link a tu GitHub o portfolio: es lo primero que mira quien te entrevista."
   },
   {
     id: "C2",
     seccion: "perfil",
     descripcion: "Perfil con sustancia",
-    puntos: 10,
+    puntos: 8,
     minimoPalabras: 40,
     // Palabras que cuentan como "menciona el área" (además de las habilidades del área).
     nombresArea: {
@@ -53,7 +53,7 @@ const REGLAS_COMUNES = [
     id: "C3",
     seccion: "proyectos",
     descripcion: "Proyectos con link y tecnologías",
-    puntos: 10,
+    puntos: 8,
     minimoTecnologias: 2,
     mensaje: "Agregá a cada proyecto el link y las tecnologías que usaste."
   },
@@ -61,11 +61,79 @@ const REGLAS_COMUNES = [
     id: "C4",
     seccion: "experiencia",
     descripcion: "Descripciones con resultados",
-    puntos: 10,
+    puntos: 8,
     verbosLogro: ["logre", "reduje", "aumente", "mejore", "optimice", "automatice"],
     mensaje: "Contá resultados, no solo tareas: por ejemplo, 'reduje el tiempo de carga un 30 %'."
+  },
+  {
+    // Reparte sus puntos entre las 4 secciones: cada una pierde los suyos si tiene errores.
+    id: "C5",
+    seccion: null,
+    descripcion: "Ortografía, mayúsculas y puntuación",
+    puntos: 8,
+    puntosPorSeccion: 2,
+    mensaje: "Revisá la ortografía y la puntuación en {seccion}: un CV con errores se descarta rápido."
   }
 ];
+
+// Datos para la regla C5. No es un diccionario completo: son los errores más comunes en CVs.
+const ORTOGRAFIA = {
+  // Errores frecuentes → forma correcta (en minúsculas; se respeta la mayúscula inicial al sugerir).
+  // Sin verbos que sin tilde también son válidos ("critica", "practico", "publico").
+  errores: {
+    desarollo: "desarrollo", desarrolo: "desarrollo", desarollador: "desarrollador", desarolladora: "desarrolladora",
+    desarrolador: "desarrollador", desarroladora: "desarrolladora",
+    experencia: "experiencia", esperiencia: "experiencia", experiensia: "experiencia",
+    exelente: "excelente", exelentes: "excelentes", escelente: "excelente",
+    aprendisaje: "aprendizaje", aprendisajes: "aprendizajes",
+    habilidadades: "habilidades", conosimiento: "conocimiento", conosimientos: "conocimientos",
+    conocimento: "conocimiento", conocimentos: "conocimientos",
+    responsavilidad: "responsabilidad",
+    proactibo: "proactivo", proactiba: "proactiva",
+    atravez: "a través", atraves: "a través", aveces: "a veces",
+    haci: "así", asi: "así", tambien: "también", ademas: "además", despues: "después",
+    mas: "más", facil: "fácil", dificil: "difícil", util: "útil", utiles: "útiles",
+    area: "área", areas: "áreas", analisis: "análisis", basico: "básico", basicos: "básicos",
+    basica: "básica", basicas: "básicas", tecnico: "técnico", tecnicos: "técnicos", tecnica: "técnica",
+    tecnicas: "técnicas",
+    dinamico: "dinámico", dinamica: "dinámica", analitico: "analítico",
+    analitica: "analítica", logico: "lógico", logica: "lógica", grafico: "gráfico", graficos: "gráficos",
+    unico: "único", unica: "única", rapido: "rápido",
+    rapida: "rápida", metodo: "método", metodos: "métodos", codigo: "código", codigos: "códigos",
+    pagina: "página", paginas: "páginas", numero: "número", numeros: "números", ultimo: "último",
+    ultima: "última", proximo: "próximo", maximo: "máximo", minimo: "mínimo", academico: "académico",
+    academica: "académica", academicos: "académicos", electronica: "electrónica", informatica: "informática",
+    matematica: "matemática", matematicas: "matemáticas", estadistica: "estadística", fisica: "física",
+    economia: "economía", ingenieria: "ingeniería", tecnologia: "tecnología", tecnologias: "tecnologías",
+    metodologia: "metodología", metodologias: "metodologías", categoria: "categoría", compania: "compañía",
+    diseno: "diseño", disenos: "diseños", disenador: "diseñador", disenadora: "diseñadora", ano: "año",
+    anos: "años", espanol: "español", ingles: "inglés", frances: "francés", aleman: "alemán",
+    portugues: "portugués", gestion: "gestión", busqueda: "búsqueda", busquedas: "búsquedas",
+    caracteristicas: "características", interes: "interés", traves: "través", ambito: "ámbito",
+    logistica: "logística", energia: "energía",
+    cientifico: "científico", especifico: "específico", optimo: "óptimo",
+    sintesis: "síntesis", hipotesis: "hipótesis", movil: "móvil", moviles: "móviles"
+  },
+  // Excepciones del control de palabras terminadas en "-cion" / "-sion".
+  excepcionesIon: ["guion", "ion"],
+  // Nombres de tecnologías: si aparecen escritos distinto (mayúsculas), se sugiere esta forma.
+  tecnologias: ["JavaScript", "TypeScript", "HTML", "CSS", "SQL", "PostgreSQL", "MySQL", "MongoDB", "SQLite",
+    "GitHub", "GitLab", "LinkedIn", "Git", "Node.js", "Next.js", "React", "Vue", "Python", "Java", "PHP",
+    "Django", "Flask", "FastAPI", "Docker", "Linux", "AWS", "Azure", "GCP", "API", "APIs", "REST", "JSON",
+    "Figma", "Excel", "Power BI", "Tableau", "Looker", "BigQuery", "NumPy", "Jupyter", "UX", "UI", "KPI",
+    "KPIs", "Scrum", "Sass", "Tailwind", "Bootstrap", "WordPress", "Photoshop", "Illustrator", ".NET", "C#"],
+  // Siglas permitidas en mayúsculas (además de las tecnologías en mayúsculas).
+  siglas: ["UTN", "UBA", "UNC", "UNLP", "UADE", "ITBA", "UNR", "UNS", "UNT", "UCA", "UP", "UB", "IBM", "SAP",
+    "CRUD", "MVC", "SOLID", "JWT", "HTTP", "HTTPS", "DNS", "SEO", "SAAS", "ERP", "CRM", "WCAG", "IOT", "ETL",
+    "QA", "TDD", "MERN", "MEAN", "LAMP", "POO", "OOP", "CV", "PDF", "USA", "CABA", "AMBA", "IT", "TI", "B1",
+    "B2", "C1", "C2", "FCE", "CAE", "TOEFL", "IELTS", "PL-300"],
+  // En español van en minúscula en medio de una oración.
+  minusculas: ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre",
+    "setiembre", "octubre", "noviembre", "diciembre", "lunes", "martes", "miércoles", "jueves", "viernes",
+    "sábado", "domingo", "inglés", "español", "portugués", "francés", "alemán", "italiano", "chino", "japonés"],
+  // Palabras que pueden ir en minúscula dentro de un nombre propio.
+  conectoresNombre: ["de", "del", "la", "las", "los", "y", "e", "da", "do", "dos", "van", "von"]
+};
 
 // Reglas por área (60 puntos cada área).
 // "grupos" (solo F1): da puntos por cada grupo de palabras que aparezca.

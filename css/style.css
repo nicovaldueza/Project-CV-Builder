@@ -621,6 +621,16 @@ input[type="month"].invalido:focus-within {
   font-size: 14px;
 }
 
+.mejora__detalles {
+  margin: 6px 0 4px;
+  padding-left: 18px;
+  font-size: 14px;
+}
+
+.mejora__detalles li {
+  margin-bottom: 2px;
+}
+
 .felicitacion {
   padding: 12px var(--espacio);
   border-radius: var(--radio);
