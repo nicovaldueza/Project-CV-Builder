@@ -6,12 +6,23 @@ const CLAVE_STORAGE = "matchdev-cv";
 // Textos de la interfaz que arma JavaScript (para traducir en la v2).
 const TEXTOS = {
   faltanCampos: (n) => n === 1 ? "Falta completar 1 campo." : `Faltan completar ${n} campos.`,
+  faltanCamposPaso: (n) => n === 1 ? "Falta completar 1 campo en este paso." : `Faltan completar ${n} campos en este paso.`,
+  faltanCamposOtroPaso: (n, paso) => `${n === 1 ? "Falta completar 1 campo" : `Faltan completar ${n} campos`}. Te llevamos al paso ${paso}.`,
+  anuncioPaso: (n, total, nombre) => `Paso ${n} de ${total}: ${nombre}`,
+  pasoCompleto: "completo",
+  pasoBloqueado: "todavía no disponible",
   errorVacio: "Completá este campo.",
   errorEmail: "Escribí un email válido, por ejemplo nombre@mail.com.",
   errorUrl: "Escribí un link completo, que empiece con https://",
   errorLinks: "Falta un link: con GitHub o portfolio alcanza.",
   errorHabilidades: "Elegí al menos una habilidad.",
   revisando: "Revisando ortografía…",
+  ejemploTitulo: {
+    backend: "Desarrollador/a Backend Junior",
+    frontend: "Desarrollador/a Frontend Junior",
+    data: "Analista de Datos Junior",
+    uxui: "Diseñador/a UX/UI Junior"
+  },
   actualidad: "Actualidad",
   enCurso: "En curso",
   placeholderNombre: "Tu nombre",
@@ -289,40 +300,132 @@ function campoValido(campo) {
   return campo.value.trim() !== "" && campo.checkValidity();
 }
 
-function validar() {
-  const invalidos = [];
+// Campos que se validan en un paso: los obligatorios, más los links (paso 4) y el grupo de habilidades (paso 3).
+function camposDelPaso(i) {
+  const paso = pasos[i];
+  const campos = [...paso.querySelectorAll("[required]")];
+  if (paso.id === "seccion-habilidades") campos.push(document.getElementById("lista-habilidades"));
+  if (paso.id === "seccion-proyectos") campos.push(document.getElementById("github"), document.getElementById("portfolio"));
+  return campos;
+}
 
-  form.querySelectorAll("[required]").forEach((campo) => {
-    const malo = !campo.closest("[hidden]") && !campoValido(campo);
-    marcar(campo, malo, malo ? mensajeError(campo) : "");
-    if (malo) invalidos.push(campo);
-  });
+// Errores de un paso, sin marcarlos: [{ campo, mensaje }], en el orden de la página.
+// Se saltean los campos ocultos dentro del paso (la lista de experiencias con "sin experiencia").
+function erroresDelPaso(i) {
+  const paso = pasos[i];
+  const errores = [];
 
-  // Links: al menos GitHub o portfolio.
-  const github = document.getElementById("github");
-  const portfolio = document.getElementById("portfolio");
-  const sinLinks = !github.value.trim() && !portfolio.value.trim();
-  [github, portfolio].forEach((campo) => {
-    const malo = sinLinks || (campo.value.trim() !== "" && !campo.checkValidity());
-    marcar(campo, malo, sinLinks ? TEXTOS.errorLinks : TEXTOS.errorUrl);
-    if (malo) invalidos.push(campo);
+  paso.querySelectorAll("[required]").forEach((campo) => {
+    const oculto = campo.closest("[hidden]");
+    if (oculto && oculto !== paso && paso.contains(oculto)) return;
+    if (!campoValido(campo)) errores.push({ campo, mensaje: mensajeError(campo) });
   });
 
   // Habilidades: al menos una elegida.
-  const grupoHabilidades = document.getElementById("lista-habilidades");
-  const sinHabilidades = cv.habilidades.length === 0;
-  marcar(grupoHabilidades, sinHabilidades, TEXTOS.errorHabilidades);
-  if (sinHabilidades) invalidos.push(grupoHabilidades.querySelector("input") || grupoHabilidades);
+  if (paso.id === "seccion-habilidades" && !paso.querySelector('input[name="habilidad"]:checked')) {
+    errores.push({ campo: document.getElementById("lista-habilidades"), mensaje: TEXTOS.errorHabilidades });
+  }
 
-  // Ordenados como aparecen en la página, para ir al primero.
-  invalidos.sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
+  // Links: al menos GitHub o portfolio, y con formato válido.
+  if (paso.id === "seccion-proyectos") {
+    const links = [document.getElementById("github"), document.getElementById("portfolio")];
+    const sinLinks = links.every((campo) => !campo.value.trim());
+    links.forEach((campo) => {
+      if (sinLinks) errores.push({ campo, mensaje: TEXTOS.errorLinks });
+      else if (campo.value.trim() && !campo.checkValidity()) errores.push({ campo, mensaje: TEXTOS.errorUrl });
+    });
+  }
+  return errores;
+}
 
+// Marca en rojo los errores del paso (y desmarca los que se corrigieron).
+function marcarPaso(i) {
+  const errores = erroresDelPaso(i);
+  const mensajes = new Map(errores.map((e) => [e.campo, e.mensaje]));
+  camposDelPaso(i).forEach((campo) => marcar(campo, mensajes.has(campo), mensajes.get(campo)));
+  return errores;
+}
+
+function enfocarError(error) {
+  const campo = error.campo.id === "lista-habilidades" ? error.campo.querySelector("input") || error.campo : error.campo;
+  campo.focus();
+}
+
+function mostrarErrorForm(texto) {
   const error = document.getElementById("error-form");
-  error.hidden = invalidos.length === 0;
-  error.textContent = invalidos.length ? TEXTOS.faltanCampos(invalidos.length) : "";
-  if (invalidos.length) invalidos[0].focus();
+  error.hidden = !texto;
+  error.textContent = texto || "";
+}
 
-  return invalidos.length === 0;
+// "Siguiente": valida solo el paso actual.
+function validarPaso(i) {
+  const errores = marcarPaso(i);
+  mostrarErrorForm(errores.length ? TEXTOS.faltanCamposPaso(errores.length) : "");
+  if (errores.length) enfocarError(errores[0]);
+  return errores.length === 0;
+}
+
+// "Criticar mi CV": valida todo; si falta algo, lleva al primer paso con errores (RF07).
+function validarTodo() {
+  const porPaso = pasos.map((_, i) => marcarPaso(i));
+  const total = porPaso.reduce((suma, errores) => suma + errores.length, 0);
+  if (!total) {
+    mostrarErrorForm("");
+    return true;
+  }
+  const primero = porPaso.findIndex((errores) => errores.length);
+  irAPaso(primero, { enfocar: false });
+  mostrarErrorForm(primero === pasoActual && primero === ULTIMO_PASO ? TEXTOS.faltanCampos(total) : TEXTOS.faltanCamposOtroPaso(total, primero + 1));
+  enfocarError(porPaso[primero][0]);
+  return false;
+}
+
+// ---------- Pasos del formulario ----------
+
+const pasos = [...form.querySelectorAll(".seccion[data-paso]")];
+const ULTIMO_PASO = pasos.length - 1;
+let pasoActual = 0;
+let pasoMaximo = 0; // el paso más lejano al que se puede saltar desde la barra
+
+const nombrePaso = (i) => pasos[i].querySelector("legend").textContent.replace(/^\d+\.\s*/, "");
+
+function irAPaso(n, { enfocar = true } = {}) {
+  pasoActual = n;
+  pasoMaximo = Math.max(pasoMaximo, n);
+  pasos.forEach((paso, i) => { paso.hidden = i !== n; });
+
+  document.getElementById("btn-anterior").hidden = n === 0;
+  document.getElementById("btn-siguiente").hidden = n === ULTIMO_PASO;
+  document.getElementById("btn-criticar").hidden = n !== ULTIMO_PASO;
+  document.getElementById("btn-pdf").hidden = n !== ULTIMO_PASO;
+  mostrarErrorForm("");
+  actualizarBarraPasos();
+  document.getElementById("anuncio-paso").textContent = TEXTOS.anuncioPaso(n + 1, pasos.length, nombrePaso(n));
+
+  if (enfocar) {
+    form.scrollIntoView({ block: "start" });
+    const titulo = pasos[n].querySelector("legend");
+    titulo.setAttribute("tabindex", "-1");
+    titulo.focus({ preventScroll: true });
+  }
+}
+
+function actualizarBarraPasos() {
+  document.querySelectorAll("[data-ir-paso]").forEach((boton) => {
+    const i = Number(boton.dataset.irPaso);
+    const completo = i !== pasoActual && i <= pasoMaximo && erroresDelPaso(i).length === 0;
+    boton.disabled = i > pasoMaximo;
+    boton.classList.toggle("paso-boton--completo", completo);
+    boton.querySelector(".paso-boton__numero").textContent = completo ? "✓" : String(i + 1);
+    if (i === pasoActual) boton.setAttribute("aria-current", "step");
+    else boton.removeAttribute("aria-current");
+    // El nombre accesible es "Paso 1: Datos, completo": incluye el texto visible ("Datos").
+    boton.querySelector(".paso-boton__estado").textContent = completo ? `, ${TEXTOS.pasoCompleto}` : i > pasoMaximo ? `, ${TEXTOS.pasoBloqueado}` : "";
+  });
+}
+
+function siguientePaso() {
+  if (validarPaso(pasoActual)) irAPaso(pasoActual + 1);
 }
 
 // ---------- Recorrido ----------
@@ -342,6 +445,7 @@ function irA(id) {
 function elegirArea(area) {
   cv.area = area;
   document.getElementById("area-actual").textContent = AREAS[area];
+  document.getElementById("titulo").placeholder = TEXTOS.ejemploTitulo[area];
   document.getElementById("select-otra-area").value = area;
   const radio = document.querySelector(`input[name="area"][value="${area}"]`);
   if (radio) radio.checked = true;
@@ -402,7 +506,18 @@ document.getElementById("btn-ir-formulario").addEventListener("click", () => {
   elegirArea(elegida.value);
   modoEditor("edicion");
   irA("editor");
+  irAPaso(pasoActual);
   Diccionario.iniciar(); // el diccionario carga mientras se completa el CV
+});
+
+document.getElementById("btn-anterior").addEventListener("click", () => irAPaso(pasoActual - 1));
+document.getElementById("btn-siguiente").addEventListener("click", () => {
+  cv = leerFormulario();
+  siguientePaso();
+});
+document.querySelector(".pasos").addEventListener("click", (e) => {
+  const boton = e.target.closest("[data-ir-paso]");
+  if (boton && !boton.disabled) irAPaso(Number(boton.dataset.irPaso));
 });
 
 document.getElementById("btn-cambiar-area").addEventListener("click", () => irA("area"));
@@ -454,18 +569,18 @@ document.getElementById("sin-experiencia").addEventListener("change", (e) => {
   guardar();
 });
 
+// Enter en un campo: en los primeros pasos equivale a "Siguiente"; en el último, a "Criticar mi CV".
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   cv = leerFormulario();
-  if (validar()) criticarYMostrar();
+  if (pasoActual < ULTIMO_PASO) siguientePaso();
+  else if (validarTodo()) criticarYMostrar();
 });
 
 document.getElementById("btn-editar").addEventListener("click", () => {
   modoEditor("edicion");
   window.scrollTo(0, 0);
-  const primeraSeccion = document.querySelector("#seccion-perfil legend");
-  primeraSeccion.setAttribute("tabindex", "-1");
-  primeraSeccion.focus({ preventScroll: true });
+  irAPaso(0);
 });
 
 document.getElementById("btn-otra-area").addEventListener("click", () => {
@@ -485,4 +600,9 @@ document.getElementById("btn-pdf-resultado").addEventListener("click", imprimir)
   escribirFormulario();
   if (cv.area) elegirArea(cv.area);
   renderPreview();
+
+  // Con un CV guardado, se puede saltar hasta el primer paso que tenga algo sin completar.
+  const primeroIncompleto = pasos.findIndex((_, i) => erroresDelPaso(i).length);
+  pasoMaximo = primeroIncompleto === -1 ? ULTIMO_PASO : primeroIncompleto;
+  irAPaso(0, { enfocar: false });
 })();

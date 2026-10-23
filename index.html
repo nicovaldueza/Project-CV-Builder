@@ -67,10 +67,21 @@
           <button type="button" class="boton boton--texto" id="btn-cambiar-area">Cambiar</button>
         </div>
 
+        <!-- Barra de pasos: se puede saltar a cualquier paso ya alcanzado -->
+        <nav class="pasos" aria-label="Pasos del CV">
+          <ol>
+            <li><button type="button" class="paso-boton" data-ir-paso="0"><span class="paso-boton__numero" aria-hidden="true">1</span><span class="visualmente-oculto">Paso 1: </span><span class="paso-boton__nombre">Datos</span><span class="visualmente-oculto paso-boton__estado"></span></button></li>
+            <li><button type="button" class="paso-boton" data-ir-paso="1"><span class="paso-boton__numero" aria-hidden="true">2</span><span class="visualmente-oculto">Paso 2: </span><span class="paso-boton__nombre">Experiencia</span><span class="visualmente-oculto paso-boton__estado"></span></button></li>
+            <li><button type="button" class="paso-boton" data-ir-paso="2"><span class="paso-boton__numero" aria-hidden="true">3</span><span class="visualmente-oculto">Paso 3: </span><span class="paso-boton__nombre">Habilidades</span><span class="visualmente-oculto paso-boton__estado"></span></button></li>
+            <li><button type="button" class="paso-boton" data-ir-paso="3"><span class="paso-boton__numero" aria-hidden="true">4</span><span class="visualmente-oculto">Paso 4: </span><span class="paso-boton__nombre">Proyectos</span><span class="visualmente-oculto paso-boton__estado"></span></button></li>
+          </ol>
+        </nav>
+        <p class="visualmente-oculto" id="anuncio-paso" aria-live="polite"></p>
+
         <div class="mensaje-error mensaje-error--bloque" id="error-form" role="alert" hidden></div>
 
         <!-- Datos + Perfil -->
-        <fieldset class="seccion" id="seccion-perfil">
+        <fieldset class="seccion" id="seccion-perfil" data-paso="0">
           <legend>1. Datos y perfil</legend>
           <div class="campos campos--2">
             <div class="campo">
@@ -102,7 +113,7 @@
         </fieldset>
 
         <!-- Experiencia + Educación -->
-        <fieldset class="seccion" id="seccion-experiencia">
+        <fieldset class="seccion" id="seccion-experiencia" data-paso="1" hidden>
           <legend>2. Experiencia y educación</legend>
 
           <h3 class="seccion__subtitulo">Experiencia laboral</h3>
@@ -119,7 +130,7 @@
         </fieldset>
 
         <!-- Habilidades -->
-        <fieldset class="seccion" id="seccion-habilidades">
+        <fieldset class="seccion" id="seccion-habilidades" data-paso="2" hidden>
           <legend>3. Habilidades</legend>
           <p class="campo__ayuda" id="ayuda-habilidades">Elegí las que manejás. Tienen que aparecer también en tus proyectos para sumar todos los puntos.</p>
           <div class="habilidades" id="lista-habilidades" role="group" aria-describedby="ayuda-habilidades"></div>
@@ -130,7 +141,7 @@
         </fieldset>
 
         <!-- Proyectos + Links -->
-        <fieldset class="seccion" id="seccion-proyectos">
+        <fieldset class="seccion" id="seccion-proyectos" data-paso="3" hidden>
           <legend>4. Proyectos y links</legend>
           <div class="lista" id="lista-proyectos" data-lista="proyectos"></div>
           <button type="button" class="boton boton--secundario" data-agregar="proyectos">+ Agregar proyecto</button>
@@ -153,9 +164,11 @@
           </div>
         </fieldset>
 
-        <div class="acciones">
-          <button type="submit" class="boton boton--primario" id="btn-criticar">Criticar mi CV</button>
-          <button type="button" class="boton boton--secundario" id="btn-pdf">Descargar PDF</button>
+        <div class="acciones acciones--pasos">
+          <button type="button" class="boton boton--secundario" id="btn-anterior" hidden>← Anterior</button>
+          <button type="button" class="boton boton--primario" id="btn-siguiente">Siguiente →</button>
+          <button type="submit" class="boton boton--primario" id="btn-criticar" hidden>Criticar mi CV</button>
+          <button type="button" class="boton boton--secundario" id="btn-pdf" hidden>Descargar PDF</button>
         </div>
       </form>
 

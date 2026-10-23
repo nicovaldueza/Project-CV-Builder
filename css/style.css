@@ -249,6 +249,106 @@ a { color: var(--color-acento); }
   margin: 0;
 }
 
+/* ---------- Barra de pasos ---------- */
+
+.pasos ol {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.pasos li {
+  position: relative;
+}
+
+/* Línea que une cada número con el anterior. */
+.pasos li + li::before {
+  content: "";
+  position: absolute;
+  top: 25px;
+  right: calc(50% + 22px);
+  left: calc(-50% + 22px);
+  height: 2px;
+  background: var(--color-borde);
+}
+
+.pasos li:has(.paso-boton:not(:disabled)) + li:has(.paso-boton:not(:disabled))::before {
+  background: var(--color-acento);
+}
+
+.paso-boton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 2px;
+  border: 0;
+  border-radius: var(--radio);
+  background: none;
+  color: var(--color-texto-suave);
+  font: inherit;
+  cursor: pointer;
+}
+
+.paso-boton__numero {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--color-borde);
+  border-radius: 50%;
+  background: var(--color-fondo);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.paso-boton__nombre {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.paso-boton:hover:not(:disabled) .paso-boton__numero {
+  border-color: var(--color-acento);
+}
+
+.paso-boton--completo .paso-boton__numero {
+  border-color: var(--color-acento);
+  background: var(--color-acento-suave);
+  color: var(--color-acento-hover);
+}
+
+.paso-boton[aria-current="step"] {
+  color: var(--color-acento-hover);
+}
+
+.paso-boton[aria-current="step"] .paso-boton__numero {
+  border-color: var(--color-acento);
+  background: var(--color-acento);
+  color: #FFFFFF;
+}
+
+.paso-boton[aria-current="step"] .paso-boton__nombre {
+  font-weight: 600;
+}
+
+.paso-boton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Anterior a la izquierda; Siguiente / Criticar a la derecha. */
+.acciones--pasos {
+  justify-content: flex-end;
+}
+
+.acciones--pasos #btn-anterior {
+  margin-right: auto;
+}
+
 .seccion {
   margin: 0 0 24px;
   padding: 20px;
@@ -676,6 +776,12 @@ input[type="month"].invalido:focus-within {
 
   .acciones .boton {
     flex: 1 1 100%;
+  }
+
+  .acciones--pasos #btn-anterior,
+  .acciones--pasos #btn-siguiente {
+    flex: 1 1 0;
+    margin-right: 0;
   }
 }
 

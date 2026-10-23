@@ -23,7 +23,7 @@ Perfiles Trainee/Junior que buscan su primer trabajo en Backend, Frontend, Data 
 
 1. Landing: qué es Match Dev y botón "Empezar".
 2. Elegir el área: Backend, Frontend, Data o UX/UI.
-3. Completar el CV por secciones (Datos + Perfil, Experiencia + Educación, Habilidades, Proyectos + Links). Mientras tanto se ve la vista previa.
+3. Completar el CV en 4 pasos, de a uno por vez (Datos + Perfil, Experiencia + Educación, Habilidades, Proyectos + Links), con "Anterior" y "Siguiente" y una barra de pasos para saltar a los ya alcanzados. Mientras tanto se ve la vista previa.
 4. Apretar "Criticar mi CV".
 5. Ver el resultado en un panel al lado de la vista previa (en celular, debajo): puntaje 0–100, semáforo por sección y lista de mejoras.
 6. Corregir el CV y volver a criticar, probar con otra área, o descargar el CV en PDF.
@@ -301,13 +301,13 @@ Si sobra tiempo, se hace primero el tono elegible.
 
 | ID | Criterio |
 | --- | --- |
-| RF01 | Al escribir en un campo, el dato aparece en la vista previa. Si agrego o quito una experiencia, educación o proyecto, la vista previa se actualiza. |
+| RF01 | Al escribir en un campo, el dato aparece en la vista previa. Si agrego o quito una experiencia, educación o proyecto, la vista previa se actualiza. Veo un paso por vez: "Siguiente" (o Enter en un campo) avanza solo si el paso está completo; "Anterior" siempre vuelve; en la barra de pasos puedo saltar a cualquier paso ya alcanzado, y los completos se marcan con ✓. |
 | RF02 | Si elijo un área, veo la lista de habilidades de esa área y el área elegida queda marcada. Si no elijo ninguna, no puedo avanzar al formulario. |
 | RF03 | Si aprieto "Criticar mi CV" con todo completo, veo la crítica calculada con las reglas comunes y las del área elegida. |
 | RF04 | Veo un puntaje entero de 0 a 100. Un CV que cumple todas las reglas da 100; uno que no cumple ninguna da 0. |
 | RF05 | Veo las 4 secciones, cada una con su color y su texto (Bajo / Medio / Bien), según los rangos <50, 50–79 y ≥80. |
 | RF06 | Veo una mejora por cada regla no cumplida o cumplida a medias, con los puntos perdidos, ordenadas de mayor a menor. Si cumplo todo, veo un mensaje de felicitación en lugar de la lista. |
-| RF07 | Si aprieto "Criticar mi CV" con campos obligatorios vacíos, no se calcula la crítica: veo un mensaje con la cantidad de campos que faltan, esos campos se marcan en rojo y el foco va al primero. Al completarlo, deja de estar en rojo. |
+| RF07 | Si aprieto "Siguiente" con campos vacíos en el paso, no avanza: veo cuántos faltan en ese paso, se marcan en rojo con su mensaje y el foco va al primero. Si aprieto "Criticar mi CV" y falta algo en otro paso, me lleva a ese paso con el mismo aviso. Al completar un campo, deja de estar en rojo. |
 | RF08 | Si aprieto "Descargar PDF", se abre la impresión del navegador y la hoja muestra solo el CV (sin formulario, crítica ni botones), en A4 y legible. |
 | RF09 | Si completo campos y recargo la página o la cierro y la vuelvo a abrir, veo el CV y el área como los dejé. |
 | RF10 (v2) | Si cambio el idioma, la página, el CV y la crítica pasan a inglés y la elección se mantiene al recargar. |

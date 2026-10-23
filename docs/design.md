@@ -65,6 +65,12 @@ Grupos:
 3. Habilidades.
 4. Proyectos + Links.
 
+Se muestra **un paso por vez**:
+- **Barra de pasos** arriba (1 Datos · 2 Experiencia · 3 Habilidades · 4 Proyectos): el actual en índigo, los completos con ✓, los que todavía no se alcanzaron deshabilitados. Se puede saltar a cualquier paso ya alcanzado.
+- **"Siguiente"** valida solo el paso actual; **"Anterior"** siempre vuelve. Enter en un campo equivale a "Siguiente".
+- En el último paso: **"Criticar mi CV"** y **"Descargar PDF"**.
+- Al cambiar de paso, el foco va al título del paso y se anuncia "Paso N de 4" (`aria-live`).
+
 Experiencias, estudios y proyectos se pueden agregar/quitar. La vista previa se mantiene visible mientras se completa.
 
 ## 8. Resultado
