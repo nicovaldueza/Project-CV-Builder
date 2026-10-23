@@ -22,6 +22,8 @@ Estados: `[ ]` pendiente · `[~]` en progreso · `[x]` completada · `[!]` bloqu
 - [x] Experiencia + Educación.
 - [x] Habilidades.
 - [x] Proyectos + Links.
+- [x] Formulario en 4 pasos con Anterior/Siguiente y barra de pasos.
+- [x] Empezar un CV nuevo (portada, formulario y resultado), con confirmación.
 - [x] Vista previa.
 - [x] “Criticar mi CV”.
 - [x] Panel de resultado.

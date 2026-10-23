@@ -14,9 +14,11 @@ Completar la columna "Resultado" con ✅ / ❌ y la fecha.
 | C5 | CV con faltas de ortografía, mayúsculas y puntuación: cada error aparece en su sección con la corrección; un CV bien escrito no tiene marcas. | ✅ 22/10 |
 | C5 diccionario | Con el diccionario cargado se detectan faltas fuera de la lista ("poblemas", "Hize", "pruevas"); el voseo y el vocabulario técnico no se marcan; sin diccionario, la crítica avisa y sigue con las reglas. | ✅ 23/10 |
 | RF07 | Dejar campos vacíos y criticar: mensaje con la cantidad, campos en rojo, foco en el primero. | ✅ 20/10 |
+| Pasos | "Siguiente" con el paso incompleto no avanza y marca solo ese paso; Enter = Siguiente; "Anterior" vuelve; la barra salta a pasos alcanzados y no a los bloqueados; criticar con un error en el paso 1 lleva al paso 1; con un CV guardado completo, todos los pasos habilitados. | ✅ 23/10 |
 | RF08 | "Descargar PDF": la hoja muestra solo el CV, en A4. | ✅ 22/10 (PDF generado con Edge); falta el diálogo en Chrome |
 | RF09 | Completar campos, recargar la página: el CV y el área siguen ahí. | ✅ 20/10 |
 | Otra área | "Probar con otra área": la crítica se recalcula con el mismo CV. | ✅ 20/10 |
+| RF11 | Con un CV guardado: la portada dice "Continuar mi CV" y muestra "Empezar uno nuevo". Cancelar y Esc no cambian nada. Confirmar desde el formulario y desde el resultado vacía el CV (pantalla, vista previa y localStorage), mantiene el área y vuelve al paso 1 con la barra reiniciada; desde la portada vuelve a elegir área. | ✅ 23/10 |
 | RNF01 | A 360 px no hay scroll horizontal y el resultado queda debajo de la vista previa. | ✅ 20/10 |
 | RNF02 | Recorrido completo con teclado. Lighthouse celular ≥ 90 en Rendimiento y Accesibilidad. | ✅ 22/10 |
 
@@ -59,3 +61,9 @@ Herramientas: Microsoft Edge (Chromium) en modo headless, Lighthouse 12 y puppet
 - **CV mal escrito:** 14 de 14 errores detectados, con la corrección justa ("Aplicasion" → "Aplicación").
 - **Navegador:** con el worker real, la crítica tarda ~0,6 s, incluida la carga del diccionario, y el botón muestra "Revisando ortografía…". Sin worker, avisa "No se pudo cargar el diccionario" y sigue con la lista de errores frecuentes.
 - Recorrido con teclado y Lighthouse (portada 100/100/100/100, formulario y resultado 100 de accesibilidad) sin cambios.
+
+## Notas del 23/10 (formulario en pasos)
+
+- Navegador: todos los casos de la fila "Pasos", a 360 px y a 1366 px, sin scroll horizontal.
+- Teclado: el recorrido completo avanza con Enter en "Siguiente" por los 4 pasos (53 paradas de Tab) y critica. Lighthouse accesibilidad del formulario y del resultado: 100. Se corrigió el aviso `label-content-name-mismatch` de la barra de pasos (el nombre accesible ahora incluye el texto visible).
+- Lighthouse de la portada: 100 en las 4 categorías.
