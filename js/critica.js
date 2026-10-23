@@ -16,7 +16,9 @@
       { id: "B2", seccion: "habilidades", mensaje: "...", perdidos: 15, pista: "" },
       { id: "C5-perfil", seccion: "perfil", mensaje: "...", perdidos: 2, pista: "2 errores.",
         detalles: ["Perfil: «desarollo» → «desarrollo»", "..."] }   // "detalles" solo en ortografía
-    ]
+    ],
+    dudosas: [{ lugar: "Perfil", palabra: "Kubernets" }],  // no están en el diccionario y no restan
+    diccionario: "completo"            // "completo" | "no-disponible" | "sin-diccionario"
   }
 */
 
@@ -159,14 +161,18 @@ function fragmento(texto, indice) {
 }
 
 /*
-  Revisa un texto y devuelve una lista de errores (strings).
+  Revisa un texto. Devuelve { errores: [strings], dudosas: [palabras] }.
   tipo: "prosa" (perfil, descripciones), "corto" (títulos, nombres, tecnologías) o "nombre" (nombre, ubicación).
   opciones.inicio: exige mayúscula al principio. opciones.puntoFinal: exige punto al final.
+  opciones.diccionario = false: no se revisa contra el diccionario (empresas, instituciones, tecnologías).
+  diccionario: el resultado de Diccionario.revisar() o null si no está disponible.
 */
-function revisarTexto(textoOriginal, tipo, opciones = {}) {
+function revisarTexto(textoOriginal, tipo, opciones = {}, diccionario = null) {
   const errores = new Set();
+  const dudosas = new Set();
   const texto = sinUrls(textoOriginal);
-  if (!texto.trim()) return [];
+  if (!texto.trim()) return { errores: [], dudosas: [] };
+  const usarDiccionario = diccionario && diccionario.disponible && tipo !== "nombre" && opciones.diccionario !== false;
 
   // Palabra por palabra: errores frecuentes, tildes en -ción/-sión y minúsculas obligatorias.
   for (const m of texto.matchAll(/\p{L}+/gu)) {
@@ -178,8 +184,20 @@ function revisarTexto(textoOriginal, tipo, opciones = {}) {
       errores.add(`«${palabra}» → «${MINUSCULAS_NORMALIZADAS.get(normalizada)}» (en español, meses, días e idiomas van en minúscula)`);
     } else if (ORTOGRAFIA.errores[minuscula]) {
       errores.add(`«${palabra}» → «${igualarMayuscula(palabra, ORTOGRAFIA.errores[minuscula])}»`);
+    } else if (usarDiccionario && diccionario.incorrectas.has(palabra)) {
+      // Con una corrección cercana es un error; sin ninguna, solo se marca para revisar.
+      // Va antes que la regla de -ción: también corrige la letra ("aplicasion" → "aplicación").
+      const sugerencias = diccionario.incorrectas.get(palabra);
+      if (sugerencias.length === 1) errores.add(`«${palabra}» → «${sugerencias[0]}»`);
+      else if (sugerencias.length > 1) errores.add(`«${palabra}» → ¿«${sugerencias.join("» o «")}»?`);
+      else dudosas.add(palabra);
     } else if (/[cs]ion$/.test(minuscula) && !/ssion$/.test(minuscula) && minuscula.length > 4 && !ORTOGRAFIA.excepcionesIon.includes(minuscula)) {
-      errores.add(`«${palabra}» → «${palabra.slice(0, -3)}${palabra.slice(-3).replace(/[oO]/, (o) => (o === "o" ? "ó" : "Ó"))}» (lleva tilde)`);
+      // Sin diccionario no se sabe si "-sion" era "-sión" o "-ción" ("aplicasion"): se muestran las dos.
+      const conTilde = palabra.slice(0, -3) + palabra.slice(-3).replace(/[oO]/, (o) => (o === "o" ? "ó" : "Ó"));
+      const conC = conTilde.slice(0, -4) + (conTilde[conTilde.length - 4] === "S" ? "C" : "c") + conTilde.slice(-3);
+      errores.add(/cion$/.test(minuscula)
+        ? `«${palabra}» → «${conTilde}» (lleva tilde)`
+        : `«${palabra}» → ¿«${conTilde}» o «${conC}»? (lleva tilde)`);
     } else if (/[cs]iónes$/.test(minuscula)) {
       errores.add(`«${palabra}» → «${palabra.replace(/ó(?=nes$)/i, "o")}» (en plural no lleva tilde)`);
     }
@@ -259,7 +277,7 @@ function revisarTexto(textoOriginal, tipo, opciones = {}) {
 
   if (opciones.puntoFinal && !/[.!?…)]$/.test(texto.trim())) errores.add("Terminá el texto con un punto.");
 
-  return [...errores];
+  return { errores: [...errores], dudosas: [...dudosas] };
 }
 
 // Todos los textos del CV que se revisan, agrupados por sección del semáforo.
@@ -274,35 +292,124 @@ function camposParaRevisar(cv) {
 
   cv.experiencias.forEach((e, i) => {
     agregar("experiencia", `Experiencia ${i + 1} · puesto`, e.puesto, "corto", { inicio: true });
-    agregar("experiencia", `Experiencia ${i + 1} · empresa`, e.empresa, "corto");
+    agregar("experiencia", `Experiencia ${i + 1} · empresa`, e.empresa, "corto", { diccionario: false });
     agregar("experiencia", `Experiencia ${i + 1} · descripción`, e.descripcion, "prosa");
   });
   cv.educacion.forEach((e, i) => {
     agregar("experiencia", `Educación ${i + 1} · título`, e.titulo, "corto", { inicio: true });
-    agregar("experiencia", `Educación ${i + 1} · institución`, e.institucion, "corto");
+    agregar("experiencia", `Educación ${i + 1} · institución`, e.institucion, "corto", { diccionario: false });
   });
 
   agregar("habilidades", "Otras habilidades", cv.otrasHabilidades, "corto");
 
   cv.proyectos.forEach((p, i) => {
-    agregar("proyectos", `Proyecto ${i + 1} · nombre`, p.nombre, "corto");
-    agregar("proyectos", `Proyecto ${i + 1} · tecnologías`, p.tecnologias, "corto");
+    agregar("proyectos", `Proyecto ${i + 1} · nombre`, p.nombre, "corto", { diccionario: false });
+    agregar("proyectos", `Proyecto ${i + 1} · tecnologías`, p.tecnologias, "corto", { diccionario: false });
     agregar("proyectos", `Proyecto ${i + 1} · descripción`, p.descripcion, "prosa");
   });
   return campos;
 }
 
 // C5: cada sección tiene sus puntos; 1 error resta la mitad y 2 o más, todo.
-function evaluarOrtografia(regla, cv) {
+// Las palabras dudosas (no están en el diccionario y no tienen corrección cercana) no restan.
+function evaluarOrtografia(regla, cv, diccionario) {
   const campos = camposParaRevisar(cv);
   return Object.keys(campos).map((seccion) => {
-    const detalles = campos[seccion].flatMap((campo) =>
-      revisarTexto(campo.texto, campo.tipo, campo.opciones).map((error) => `${campo.lugar}: ${error}`)
-    );
+    const detalles = [];
+    const dudosas = [];
+    campos[seccion].forEach((campo) => {
+      const revision = revisarTexto(campo.texto, campo.tipo, campo.opciones, diccionario);
+      revision.errores.forEach((error) => detalles.push(`${campo.lugar}: ${error}`));
+      revision.dudosas.forEach((palabra) => dudosas.push({ lugar: campo.lugar, palabra }));
+    });
     const obtenidos = detalles.length === 0 ? regla.puntosPorSeccion : detalles.length === 1 ? regla.puntosPorSeccion / 2 : 0;
-    return { seccion, obtenidos, detalles };
+    return { seccion, obtenidos, detalles, dudosas };
   });
 }
+
+// ---------- Diccionario Hunspell (en un Web Worker, ver js/ortografia-worker.js) ----------
+
+// Palabras bien escritas que el diccionario no trae: la lista blanca, las tecnologías,
+// las habilidades y las palabras clave de las reglas. Se comparan sin tildes ni mayúsculas.
+const PERMITIDAS = new Set(
+  [
+    ...ORTOGRAFIA.permitidas,
+    ...ORTOGRAFIA.tecnologias,
+    ...ORTOGRAFIA.siglas,
+    ...Object.values(HABILIDADES).flat(),
+    ...Object.values(REGLAS_AREA).flat().flatMap((regla) => regla.palabras || regla.grupos.flat()),
+    ...Object.values(REGLAS_COMUNES.find((regla) => regla.id === "C2").nombresArea).flat()
+  ].flatMap((texto) => normalizar(texto).split(/[^\p{L}]+/u)).filter(Boolean)
+);
+
+// Palabras del CV que hay que mandar al diccionario. Se saltean las cortas, las que tienen
+// mayúsculas en el medio (siglas, "GitHub"), los nombres propios (mayúscula a mitad de oración),
+// la lista blanca y las que ya revisan las otras reglas.
+function palabrasParaDiccionario(cv) {
+  const palabras = new Set();
+  Object.values(camposParaRevisar(cv)).flat().forEach((campo) => {
+    if (campo.tipo === "nombre" || (campo.opciones && campo.opciones.diccionario === false)) return;
+    const texto = sinUrls(campo.texto);
+    for (const m of texto.matchAll(/\p{L}+/gu)) {
+      const palabra = m[0];
+      const minuscula = palabra.toLowerCase();
+      if (palabra.length < 3 || /\p{Lu}/u.test(palabra.slice(1))) continue;
+      if (esMayuscula(palabra.charAt(0)) && !inicioDeOracion(texto, m.index)) continue;
+      if (PERMITIDAS.has(normalizar(palabra)) || ORTOGRAFIA.errores[minuscula] || MINUSCULAS_NORMALIZADAS.has(normalizar(palabra))) continue;
+      palabras.add(palabra);
+    }
+  });
+  return [...palabras];
+}
+
+const Diccionario = {
+  worker: null,
+  pendientes: new Map(),
+  ultimoId: 0,
+
+  // Arranca el worker y la carga del diccionario en segundo plano (se llama al abrir el formulario).
+  iniciar() {
+    if (this.worker || typeof Worker === "undefined") return;
+    try {
+      this.worker = new Worker("js/ortografia-worker.js");
+    } catch (error) {
+      return; // por ejemplo, abriendo index.html como archivo: se sigue sin diccionario
+    }
+    this.worker.onmessage = (evento) => {
+      const resolver = this.pendientes.get(evento.data.id);
+      if (resolver) resolver(evento.data);
+    };
+    this.worker.onerror = () => {
+      this.pendientes.forEach((resolver) => resolver({ error: "worker" }));
+      this.pendientes.clear();
+    };
+    this.consultar([]); // la primera consulta dispara la carga
+  },
+
+  consultar(palabras, espera = 10000) {
+    return new Promise((resolver) => {
+      if (!this.worker) return resolver({ error: "sin worker" });
+      const id = ++this.ultimoId;
+      const plazo = setTimeout(() => terminar({ error: "tiempo" }), espera);
+      const terminar = (datos) => {
+        clearTimeout(plazo);
+        this.pendientes.delete(id);
+        resolver(datos);
+      };
+      this.pendientes.set(id, terminar);
+      this.worker.postMessage({ id, palabras });
+    });
+  },
+
+  // Devuelve { disponible, incorrectas: Map(palabra → [sugerencias]) }.
+  async revisar(cv) {
+    this.iniciar();
+    const respuesta = await this.consultar(palabrasParaDiccionario(cv));
+    if (respuesta.error) return { disponible: false, incorrectas: new Map() };
+    const incorrectas = respuesta.resultados.filter((r) => !r.correcta).map((r) => [r.palabra, r.sugerencias]);
+    return { disponible: true, incorrectas: new Map(incorrectas) };
+  }
+};
 
 // ---------- Reglas del área (palabras clave) ----------
 
@@ -334,7 +441,8 @@ function evaluarGrupos(regla, textos) {
 
 // ---------- Motor ----------
 
-function criticar(cv) {
+// diccionario: el resultado de Diccionario.revisar(cv), o null para criticar sin diccionario.
+function criticar(cv, diccionario = null) {
   const textos = textosDelCv(cv);
   const secciones = {};
   for (const clave in SECCIONES) {
@@ -370,7 +478,9 @@ function criticar(cv) {
 
   // C5 reparte sus puntos entre las secciones: una mejora por cada sección con errores.
   const reglaOrtografia = REGLAS_COMUNES.find((regla) => regla.id === "C5");
-  evaluarOrtografia(reglaOrtografia, cv).forEach(({ seccion, obtenidos, detalles }) => {
+  const dudosas = [];
+  evaluarOrtografia(reglaOrtografia, cv, diccionario).forEach(({ seccion, obtenidos, detalles, dudosas: dudosasSeccion }) => {
+    dudosas.push(...dudosasSeccion);
     puntaje += obtenidos;
     secciones[seccion].obtenidos += obtenidos;
     secciones[seccion].posibles += reglaOrtografia.puntosPorSeccion;
@@ -395,7 +505,13 @@ function criticar(cv) {
   // De mayor a menor por puntos perdidos; si empatan, queda el orden de las reglas.
   mejoras.sort((a, b) => b.perdidos - a.perdidos);
 
-  return { puntaje: Math.round(puntaje), secciones, mejoras };
+  return {
+    puntaje: Math.round(puntaje),
+    secciones,
+    mejoras,
+    dudosas,
+    diccionario: diccionario ? (diccionario.disponible ? "completo" : "no-disponible") : "sin-diccionario"
+  };
 }
 
 function mostrarResultado(resultado, cv) {
@@ -436,5 +552,10 @@ function mostrarResultado(resultado, cv) {
     <h3>Por sección</h3>
     <ul class="semaforo">${filasSecciones}</ul>
     <h3>Qué mejorar</h3>
-    ${listaMejoras}`;
+    ${listaMejoras}
+    ${resultado.dudosas && resultado.dudosas.length ? `
+      <h3>Palabras para revisar</h3>
+      <p class="mejora__pista">No están en el diccionario y no encontramos una corrección parecida. Si están bien escritas (un nombre, un término técnico), ignoralas: no restan puntos.</p>
+      <ul class="mejora__detalles">${resultado.dudosas.map((d) => `<li>${escapar(d.lugar)}: «${escapar(d.palabra)}»</li>`).join("")}</ul>` : ""}
+    ${resultado.diccionario === "no-disponible" ? `<p class="mejora__pista">No se pudo cargar el diccionario: la ortografía se revisó solo con la lista de errores frecuentes.</p>` : ""}`;
 }

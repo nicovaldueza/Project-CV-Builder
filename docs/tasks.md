@@ -71,6 +71,7 @@ Estados: `[ ]` pendiente · `[~]` en progreso · `[x]` completada · `[!]` bloqu
 - [x] C3 Proyectos con link + ≥2 tecnologías — 8.
 - [x] C4 Resultados concretos — 8.
 - [x] C5 Ortografía, mayúsculas y puntuación — 8 (2 por sección).
+- [x] C5 con diccionario Hunspell es-AR (Web Worker, lista blanca, palabras para revisar sin descuento).
 
 ### Backend — 60 pts
 - [x] B1 Lenguaje backend — 15.

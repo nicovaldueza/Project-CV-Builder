@@ -1,7 +1,8 @@
 # Match Dev — Especificaciones del Proyecto
 
 > Versión 1 (MVP). Entrega: lunes 26/10/2026.
-> Última actualización: 22/10/2026 (se agregó la regla C5 de ortografía; las reglas comunes pasan a 8 puntos).
+> Última actualización: 23/10/2026 (la regla C5 usa un diccionario Hunspell de español rioplatense).
+> 22/10/2026: se agregó la regla C5 de ortografía; las reglas comunes pasan a 8 puntos.
 > Antes: 20/10/2026 (reglas por área, objeto `cv`, estilo visual, RNF02 y criterios de aceptación).
 
 ## 1. Descripción general
@@ -93,14 +94,25 @@ Perfiles Trainee/Junior que buscan su primer trabajo en Backend, Frontend, Data 
 
 #### C5: ortografía, mayúsculas y puntuación
 
-Es un crítico de CV: no puede dejar pasar faltas de ortografía. Como el sitio no tiene servidor ni API, no hay un diccionario completo de español (pesaría varios MB); se detectan los errores más comunes con reglas en JavaScript. Los datos están en `ORTOGRAFIA` (`reglas.js`).
+Es un crítico de CV: no puede dejar pasar faltas de ortografía. Se combinan dos cosas, sin servidor ni API:
+
+1. **Reglas en JavaScript** (`ORTOGRAFIA` en `reglas.js`): errores frecuentes, mayúsculas y puntuación. Funcionan siempre.
+2. **Diccionario Hunspell de español de Argentina** (`assets/diccionario/`, el de LibreOffice, con voseo: "querés", "armá", "contame"), leído con `nspell` (`js/vendor/nspell.min.js`) dentro de un Web Worker (`js/ortografia-worker.js`) para no trabar la página. Revisa todas las palabras.
+
+El diccionario pesa ~230 KB comprimido (GitHub Pages lo sirve con gzip) y se carga recién al abrir el formulario, así que no afecta la carga de la portada. Si no se puede cargar (por ejemplo, abriendo `index.html` como archivo), la crítica sigue solo con las reglas y lo avisa en el resultado.
 
 - **Qué se revisa:** nombre, título, ubicación, perfil, puesto, empresa y descripción de cada experiencia, título e institución de cada estudio, "Otras habilidades" y nombre, tecnologías y descripción de cada proyecto. Los links y emails se ignoran.
 - **Ortografía:** lista de errores frecuentes en CVs ("desarollo" → "desarrollo", "codigo" → "código"…), palabras terminadas en "-cion"/"-sion" sin tilde ("programacion" → "programación") y plurales con tilde de más ("aplicaciónes"). Se dejaron afuera los verbos que sin tilde también son válidos ("critica", "practico", "publico").
 - **Mayúsculas:** oración o línea que empieza en minúscula (perfil, descripciones, título, puesto y título de estudio); palabras enteras en mayúsculas, salvo siglas (UTN, HTML5…); tecnologías mal escritas ("javascript" → "JavaScript", "github" → "GitHub"); meses, días e idiomas en mayúscula en medio de una oración ("Nivel de Inglés" → "inglés"); nombre y ubicación sin mayúscula inicial.
 - **Puntuación y espacios:** espacios dobles; espacio antes de `,` `.` `;` `:`; falta de espacio después de `,` `;` o del punto ("carga.Busco"); signos repetidos ("!!", ",,"); falta de "¿" o "¡"; paréntesis sin cerrar; perfil sin punto final.
+- **Diccionario:**
+  - Se revisan las palabras de perfil, títulos, puesto, descripciones y "Otras habilidades". No se revisan nombre, ubicación, empresa, institución, nombre del proyecto ni tecnologías (son nombres propios), ni las palabras con mayúscula a mitad de oración, las siglas o las que tienen mayúsculas en el medio ("GitHub").
+  - **Lista blanca** (`ORTOGRAFIA.permitidas`): inglés del rubro (testing, deploy, frontend, sprint…), anglicismos (testear, deployar, maquetar…) y palabras correctas que el diccionario no trae (microservicios, pyme, tecnicatura…). Se suman solas las tecnologías, las habilidades y las palabras clave de las reglas.
+  - Se aceptan las palabras con prefijos comunes cuando el resto es válido ("rediseñé", "autogestionado").
+  - **Error** (resta puntos) solo si hay una corrección cercana: primero se prueba una tilde o una ñ que falta ("habia" → "había"), después las confusiones típicas (s/c/z, b/v, ll/y, g/j, h) y, por último, las sugerencias de Hunspell a un cambio de distancia. Si hay varias, se muestran hasta 3 ("poblemas" → ¿«poblemos» o «problemas»?).
+  - **Palabra para revisar** (no resta): no está en el diccionario y no tiene una corrección parecida (un nombre, un término técnico nuevo). Se listan aparte en el resultado.
 - **Mejoras:** una por sección con errores, con la lista de cada error, dónde está y cómo corregirlo (por ejemplo, "Proyecto 1 · tecnologías: «javascript» → «JavaScript»").
-- **Límite:** no detecta palabras mal escritas que no estén en la lista ni errores de concordancia o de tildes diacríticas (tú/tu, más/mas, sí/si).
+- **Límite:** no detecta errores de concordancia ni tildes diacríticas (tú/tu, más/mas, sí/si), ni palabras mal escritas que coinciden con otra palabra válida ("echo" por "hecho").
 
 #### Reglas por área (60 puntos)
 
@@ -222,7 +234,7 @@ const cv = {
 **Rendimiento**
 
 - Lighthouse en celular: 90 o más en Rendimiento y en Accesibilidad.
-- Sin librerías externas; la única dependencia es la fuente Inter de Google Fonts, con `display=swap`.
+- Sin librerías externas cargadas desde otros sitios; la única dependencia externa es la fuente Inter de Google Fonts, con `display=swap`. La única librería es `nspell` (MIT, ~10 KB), copiada en `js/vendor/` para el diccionario (ver C5).
 - Peso total de la página menor a 500 KB (sin contar el mockup en `assets/`).
 
 **Compatibilidad**
@@ -323,15 +335,19 @@ Si sobra tiempo, se hace primero el tono elegible.
 ├── js/
 │   ├── reglas.js       # reglas comunes y de cada área (solo datos)
 │   ├── critica.js      # motor de puntaje, semáforo, panel de resultado
-│   └── formulario.js   # formulario, validación, vista previa, localStorage, PDF
-├── assets/             # mockup e imágenes
+│   ├── formulario.js   # formulario, validación, vista previa, localStorage, PDF
+│   ├── ortografia-worker.js  # Web Worker: diccionario Hunspell (C5)
+│   └── vendor/
+│       └── nspell.min.js     # lector de diccionarios Hunspell (MIT)
+├── assets/             # mockup, imágenes y favicon
+│   └── diccionario/    # es.aff, es.dic y LICENSE (español de Argentina, LibreOffice)
 ├── docs/
 │   ├── specs.md        # este archivo
 │   └── testing.md      # pruebas y resultados
 └── README.md
 ```
 
-Los scripts se cargan en este orden: `reglas.js`, `critica.js` y `formulario.js`.
+Los scripts se cargan en este orden: `reglas.js`, `critica.js` y `formulario.js`. El worker (`ortografia-worker.js`) lo crea `critica.js` al abrir el formulario y carga `nspell` y el diccionario por su cuenta.
 
 ## Anexo: fuentes de las reglas por área
 

@@ -12,6 +12,7 @@ Completar la columna "Resultado" con ✅ / ❌ y la fecha.
 | RF05 | Ver las 4 secciones con color y texto (Bajo / Medio / Bien). | ✅ 20/10 |
 | RF06 | Las mejoras aparecen ordenadas por puntos perdidos, de mayor a menor. | ✅ 20/10 |
 | C5 | CV con faltas de ortografía, mayúsculas y puntuación: cada error aparece en su sección con la corrección; un CV bien escrito no tiene marcas. | ✅ 22/10 |
+| C5 diccionario | Con el diccionario cargado se detectan faltas fuera de la lista ("poblemas", "Hize", "pruevas"); el voseo y el vocabulario técnico no se marcan; sin diccionario, la crítica avisa y sigue con las reglas. | ✅ 23/10 |
 | RF07 | Dejar campos vacíos y criticar: mensaje con la cantidad, campos en rojo, foco en el primero. | ✅ 20/10 |
 | RF08 | "Descargar PDF": la hoja muestra solo el CV, en A4. | ✅ 22/10 (PDF generado con Edge); falta el diálogo en Chrome |
 | RF09 | Completar campos, recargar la página: el CV y el área siguen ahí. | ✅ 20/10 |
@@ -49,3 +50,12 @@ Herramientas: Microsoft Edge (Chromium) en modo headless, Lighthouse 12 y puppet
 - Script del motor: 49 casos OK. Incluye CV completo y bien escrito = 100 en las 4 áreas, los puntajes nuevos de C1–C4 (8 pts) y 26 casos de `revisarTexto`: errores frecuentes, tildes en -ción, plurales, tecnologías, idiomas en minúscula, mayúsculas sostenidas, siglas, inicio de oración, viñetas, abreviaturas ("ej."), espacios, signos repetidos, "¿"/"¡", paréntesis, punto final, nombres propios y links/emails ignorados.
 - Falsos positivos: 17 textos de CV bien escritos (perfiles, descripciones con viñetas, títulos, tecnologías, nombres con "del", "Node.js", "ASP.NET", "UX/UI", "CI/CD") → ninguna marca indebida.
 - Navegador: CV de prueba con errores (Frontend) → 74/100 y 20 errores detectados, cada uno en su sección y con su corrección.
+
+## Notas del 23/10 (diccionario)
+
+- **Worker real en Node** (con `importScripts` y `fetch` simulados): carga en ~0,6 s; las consultas siguientes, ~9 ms. Corrige "habia" → "había", "hize" → "hice", "aprendisaje" → "aprendizaje", "acer" → "hacer", "nesesario" → "necesario", "sertificado" → "certificado", entre otras.
+- **Voseo:** el diccionario general de español marcaba "querés", "tenés", "armá" y "contame"; se cambió por el de Argentina, que los trae. "podés" se agregó a la lista blanca.
+- **Falsos positivos:** 4 CVs completos bien escritos (Backend, Frontend, Data y UX/UI, con anglicismos, voseo, nombres propios, "Node.js", "CI/CD", "E-commerce") → 0 errores y 0 palabras para revisar. Los 17 textos de la prueba del 22/10 → solo el error real que tenían a propósito ("Version").
+- **CV mal escrito:** 14 de 14 errores detectados, con la corrección justa ("Aplicasion" → "Aplicación").
+- **Navegador:** con el worker real, la crítica tarda ~0,6 s, incluida la carga del diccionario, y el botón muestra "Revisando ortografía…". Sin worker, avisa "No se pudo cargar el diccionario" y sigue con la lista de errores frecuentes.
+- Recorrido con teclado y Lighthouse (portada 100/100/100/100, formulario y resultado 100 de accesibilidad) sin cambios.

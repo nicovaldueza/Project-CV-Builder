@@ -114,7 +114,7 @@ Desde 360 px:
 ## 14. Rendimiento y compatibilidad
 - Lighthouse móvil: 90+ Rendimiento y Accesibilidad.
 - Página <500 KB sin mockup.
-- Sin librerías externas adicionales.
+- Sin librerías externas adicionales. Excepción: `nspell` (MIT, ~10 KB, copiada en `js/vendor/`) para el diccionario de ortografía, que se carga al abrir el formulario (ver `specs.md`, C5).
 - Inter con `display=swap`.
 - Últimas 2 versiones de Chrome, Edge y Firefox; Safari actual según `specs.md`.
 - Si `localStorage` no está disponible, la aplicación sigue funcionando sin guardar.

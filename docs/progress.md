@@ -129,3 +129,8 @@ Los resultados reales deben quedar en `testing.md`.
 - Corregido el borde de foco de los campos de mes cuando el foco pasa a la parte del año.
 
 - **Ortografía (C5):** el crítico ya no deja pasar faltas de ortografía, mayúsculas mal puestas ni errores de puntuación. Es una nueva regla común de 8 puntos (2 por sección); las comunes pasan de 4 × 10 a 5 × 8 y siguen sumando 40. Cada error aparece en las mejoras con su ubicación y la corrección.
+
+### 23/10/2026
+- **Diccionario de ortografía:** C5 usa además el diccionario Hunspell de español de Argentina (el de LibreOffice, con voseo), leído con `nspell` en un Web Worker. Revisa todas las palabras, no solo la lista de errores frecuentes. Pesa ~230 KB comprimido y se carga al abrir el formulario, así que la portada sigue con Lighthouse 100.
+- Para no castigar el vocabulario técnico: lista blanca (inglés del rubro, anglicismos, tecnologías), no se revisan nombres propios ni tecnologías, y una palabra solo resta puntos si hay una corrección cercana; si no, aparece en "Palabras para revisar" sin descuento.
+- Excepción a "sin librerías externas" de `specs.md`/`design.md`: `nspell` (MIT, ~10 KB, copiada en el repo). **A confirmar con el equipo.**
