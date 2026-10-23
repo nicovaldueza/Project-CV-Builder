@@ -132,7 +132,47 @@ const ORTOGRAFIA = {
     "setiembre", "octubre", "noviembre", "diciembre", "lunes", "martes", "miércoles", "jueves", "viernes",
     "sábado", "domingo", "inglés", "español", "portugués", "francés", "alemán", "italiano", "chino", "japonés"],
   // Palabras que pueden ir en minúscula dentro de un nombre propio.
-  conectoresNombre: ["de", "del", "la", "las", "los", "y", "e", "da", "do", "dos", "van", "von"]
+  conectoresNombre: ["de", "del", "la", "las", "los", "y", "e", "da", "do", "dos", "van", "von"],
+  // Lista blanca del diccionario: palabras bien escritas que el diccionario de español no trae.
+  // Las tecnologías, habilidades y palabras clave de las reglas ya se suman solas (critica.js).
+  permitidas: [
+    // Inglés del rubro
+    "testing", "test", "tests", "unit", "deploy", "deploys", "deployment", "frontend", "backend", "fullstack",
+    "full", "stack", "front", "back", "end", "framework", "frameworks", "library", "debugging", "debug", "feedback",
+    "hook", "hooks", "endpoint", "endpoints", "dashboard", "dashboards", "wireframe", "wireframes", "mockup",
+    "mockups", "responsive", "software", "hardware", "online", "offline", "startup", "startups", "freelance",
+    "freelancer", "pull", "request", "requests", "merge", "commit", "commits", "branch", "branches", "sprint",
+    "sprints", "stakeholder", "stakeholders", "junior", "trainee", "senior", "semi", "ssr", "jr", "sr", "team",
+    "teams", "leader", "lead", "kanban", "agile", "daily", "dailies", "review", "reviews", "code", "clean",
+    "refactor", "refactoring", "performance", "layout", "layouts", "web", "app", "apps", "mobile", "cloud",
+    "serverless", "script", "scripts", "user", "users", "research", "flow", "flows", "design", "designer",
+    "system", "systems", "prototype", "prototyping", "branding", "marketing", "ecommerce", "commerce", "retail",
+    "insight", "insights", "data", "analytics", "analyst", "business", "intelligence", "machine", "learning",
+    "deep", "big", "pipeline", "pipelines", "dataset", "datasets", "query", "queries", "report", "reporting",
+    "dev", "devs", "developer", "developers", "developer", "devops", "frontend", "bootcamp", "workshop",
+    "meetup", "webinar", "hackathon", "remote", "part", "time", "onboarding", "login", "signup", "checkout",
+    "landing", "page", "pages", "e", "learning", "crud", "middleware", "token", "tokens", "cache", "deployed",
+    "build", "builds", "release", "releases", "feature", "features", "bug", "bugs", "fix", "fixes", "issue",
+    "issues", "tickets", "ticket", "backlog", "roadmap", "kpi", "kpis", "seo", "sem", "ads", "copy", "copywriting",
+    "storytelling", "benchmark", "benchmarking", "persona", "personas", "customer", "journey", "map", "card", "sorting",
+    "case", "study", "flowchart", "sitemap", "moodboard", "survey", "surveys",
+    "usability", "accessibility", "handoff", "style", "guide", "tokens", "dark", "mode", "ui", "ux",
+    "power", "query", "pivot", "tables", "lookup", "vlookup", "notebook", "notebooks", "scraping", "web",
+    "chatbot", "chatbots", "prompt", "prompts", "copilot", "open", "source", "skills", "soft", "hard",
+    // Anglicismos en español
+    "testear", "testeo", "testeos", "testeé", "testeamos", "deployar", "deployé", "deployamos", "mergear",
+    "mergeé", "commitear", "debuggear", "debugueé", "loguear", "logueo", "scrapear", "refactorizar",
+    "refactoricé", "refactorizamos", "refactorización", "dockerizar", "dockericé", "customizar", "customicé",
+    "maquetar", "maqueté", "maquetamos", "maquetado", "responsividad", "escalabilidad", "mantenibilidad",
+    "usabilidad", "accesible", "backlog", "onboarding", "frontender", "backender",
+    // Español correcto que el diccionario no trae
+    "microservicio", "microservicios", "reutilizable", "reutilizables", "hackatón", "hackatones", "pyme",
+    "pymes", "tecnicatura", "tecnicaturas", "podés", "fintech", "fintechs", "edtech", "proptech", "insurtech",
+    "multiplataforma", "monorepo", "frontend", "full-time", "autogestionable", "autogestión", "teletrabajo",
+    "ciberseguridad", "geolocalización", "georreferenciación", "dashboard", "kpis", "e-commerce", "influencers",
+    "emprendimiento", "emprendimientos", "voluntariado", "licenciatura", "tecnicatura", "posgrado", "bootcamps",
+    "mantenible", "mantenibles", "usable", "usables", "diplomatura", "diplomaturas"
+  ]
 };
 
 // Reglas por área (60 puntos cada área).

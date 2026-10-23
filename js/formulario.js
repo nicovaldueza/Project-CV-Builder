@@ -11,6 +11,7 @@ const TEXTOS = {
   errorUrl: "Escribí un link completo, que empiece con https://",
   errorLinks: "Falta un link: con GitHub o portfolio alcanza.",
   errorHabilidades: "Elegí al menos una habilidad.",
+  revisando: "Revisando ortografía…",
   actualidad: "Actualidad",
   enCurso: "En curso",
   placeholderNombre: "Tu nombre",
@@ -354,8 +355,24 @@ function modoEditor(modo) {
   document.getElementById("resultado").hidden = modo !== "resultado";
 }
 
-function criticarYMostrar() {
-  mostrarResultado(criticar(cv), cv);
+// Espera la revisión del diccionario (en segundo plano) y muestra la crítica.
+let criticando = false;
+
+async function criticarYMostrar() {
+  if (criticando) return;
+  criticando = true;
+  const botones = [document.getElementById("btn-criticar"), document.getElementById("btn-otra-area")];
+  const textosOriginales = botones.map((boton) => boton.textContent);
+  botones.forEach((boton) => { boton.disabled = true; boton.textContent = TEXTOS.revisando; });
+  form.setAttribute("aria-busy", "true");
+
+  const diccionario = await Diccionario.revisar(cv);
+
+  botones.forEach((boton, i) => { boton.disabled = false; boton.textContent = textosOriginales[i]; });
+  form.removeAttribute("aria-busy");
+  criticando = false;
+
+  mostrarResultado(criticar(cv, diccionario), cv);
   modoEditor("resultado");
   window.scrollTo(0, 0);
   document.getElementById("titulo-resultado").setAttribute("tabindex", "-1");
@@ -385,6 +402,7 @@ document.getElementById("btn-ir-formulario").addEventListener("click", () => {
   elegirArea(elegida.value);
   modoEditor("edicion");
   irA("editor");
+  Diccionario.iniciar(); // el diccionario carga mientras se completa el CV
 });
 
 document.getElementById("btn-cambiar-area").addEventListener("click", () => irA("area"));

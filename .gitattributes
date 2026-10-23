@@ -1,0 +1,2 @@
+# El diccionario Hunspell se lee tal cual: sin conversión de finales de línea.
+assets/diccionario/* -text
