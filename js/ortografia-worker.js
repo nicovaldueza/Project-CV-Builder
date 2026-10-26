@@ -9,7 +9,7 @@ importScripts("vendor/nspell.min.js");
 let corrector = null;
 
 const listo = Promise.all(
-  ["../assets/diccionario/es.aff", "../assets/diccionario/es.dic"].map((url) =>
+  ["../assets/diccionario/es-aff.txt", "../assets/diccionario/es-dic.txt"].map((url) =>
     fetch(url).then((respuesta) => {
       if (!respuesta.ok) throw new Error(`No se pudo cargar ${url} (${respuesta.status})`);
       return respuesta.text();

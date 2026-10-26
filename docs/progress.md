@@ -136,3 +136,7 @@ Los resultados reales deben quedar en `testing.md`.
 - Excepción a "sin librerías externas" de `specs.md`/`design.md`: `nspell` (MIT, ~10 KB, copiada en el repo). **A confirmar con el equipo.**
 - **Formulario en pasos:** se ve un paso por vez, con barra de pasos (1 Datos · 2 Experiencia · 3 Habilidades · 4 Proyectos), "Anterior" y "Siguiente". "Siguiente" valida solo el paso actual; al criticar, si falta algo en otro paso, lleva a ese paso. Con un CV guardado completo, todos los pasos quedan habilitados.
 - **Empezar un CV nuevo (RF11):** si ya hay un CV guardado, se puede borrar y empezar de cero desde la portada ("Continuar mi CV" / "Empezar uno nuevo"), el formulario o el resultado, siempre con confirmación.
+
+### 26/10/2026
+- **Publicado en GitHub Pages:** https://nicovaldueza.github.io/Project-CV-Builder/ (repo público). Probado en el sitio publicado: el diccionario carga y la crítica detecta los errores.
+- El diccionario pasó a `es-aff.txt` y `es-dic.txt`: GitHub Pages servía `es.dic` como `text/x-c` sin comprimir (698 KB); como `.txt` va con gzip (~200 KB).

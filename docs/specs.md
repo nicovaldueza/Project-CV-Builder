@@ -342,7 +342,7 @@ Si sobra tiempo, se hace primero el tono elegible.
 │   └── vendor/
 │       └── nspell.min.js     # lector de diccionarios Hunspell (MIT)
 ├── assets/             # mockup, imágenes y favicon
-│   └── diccionario/    # es.aff, es.dic y LICENSE (español de Argentina, LibreOffice)
+│   └── diccionario/    # es-aff.txt, es-dic.txt y LICENSE (español de Argentina, LibreOffice; en .txt para que GitHub Pages los sirva comprimidos)
 ├── docs/
 │   ├── specs.md        # este archivo
 │   └── testing.md      # pruebas y resultados
