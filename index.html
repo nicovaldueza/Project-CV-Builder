@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Match Dev — Crítico de CV para Juniors</title>
   <meta name="description" content="Elegí el área a la que te postulás, cargá tu CV y descubrí qué le falta para Backend, Frontend, Data o UX/UI.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -23,7 +24,10 @@
         Elegí el área a la que te postulás, cargá tu CV y en segundos ves tu puntaje,
         qué secciones están flojas y qué te falta para Backend, Frontend, Data o UX/UI.
       </p>
-      <button type="button" class="boton boton--primario" id="btn-empezar">Empezar</button>
+      <div class="landing__acciones">
+        <button type="button" class="boton boton--primario" id="btn-empezar">Empezar</button>
+        <button type="button" class="boton boton--secundario" id="btn-nuevo-landing" data-nuevo-cv hidden>Empezar uno nuevo</button>
+      </div>
     </section>
 
     <!-- 2. Elegir el área -->
@@ -64,12 +68,24 @@
         <div class="form-barra">
           <p>Área: <strong id="area-actual"></strong></p>
           <button type="button" class="boton boton--texto" id="btn-cambiar-area">Cambiar</button>
+          <button type="button" class="boton boton--texto boton--peligro form-barra__nuevo" data-nuevo-cv>Empezar un CV nuevo</button>
         </div>
+
+        <!-- Barra de pasos: se puede saltar a cualquier paso ya alcanzado -->
+        <nav class="pasos" aria-label="Pasos del CV">
+          <ol>
+            <li><button type="button" class="paso-boton" data-ir-paso="0"><span class="paso-boton__numero" aria-hidden="true">1</span><span class="visualmente-oculto">Paso 1: </span><span class="paso-boton__nombre">Datos</span><span class="visualmente-oculto paso-boton__estado"></span></button></li>
+            <li><button type="button" class="paso-boton" data-ir-paso="1"><span class="paso-boton__numero" aria-hidden="true">2</span><span class="visualmente-oculto">Paso 2: </span><span class="paso-boton__nombre">Experiencia</span><span class="visualmente-oculto paso-boton__estado"></span></button></li>
+            <li><button type="button" class="paso-boton" data-ir-paso="2"><span class="paso-boton__numero" aria-hidden="true">3</span><span class="visualmente-oculto">Paso 3: </span><span class="paso-boton__nombre">Habilidades</span><span class="visualmente-oculto paso-boton__estado"></span></button></li>
+            <li><button type="button" class="paso-boton" data-ir-paso="3"><span class="paso-boton__numero" aria-hidden="true">4</span><span class="visualmente-oculto">Paso 4: </span><span class="paso-boton__nombre">Proyectos</span><span class="visualmente-oculto paso-boton__estado"></span></button></li>
+          </ol>
+        </nav>
+        <p class="visualmente-oculto" id="anuncio-paso" aria-live="polite"></p>
 
         <div class="mensaje-error mensaje-error--bloque" id="error-form" role="alert" hidden></div>
 
         <!-- Datos + Perfil -->
-        <fieldset class="seccion" id="seccion-perfil">
+        <fieldset class="seccion" id="seccion-perfil" data-paso="0">
           <legend>1. Datos y perfil</legend>
           <div class="campos campos--2">
             <div class="campo">
@@ -92,7 +108,14 @@
               <label for="ubicacion">Ubicación</label>
               <input id="ubicacion" data-campo="datos.ubicacion" type="text" placeholder="Córdoba, Argentina" required>
             </div>
-            <div class="campo campo--ancho">
+                        <div class="campo campo--ancho">
+              <label for="foto">Foto de perfil</label>
+              <input id="foto" name="foto" type="file" accept="image/*" aria-required="true" aria-describedby="ayuda-foto">
+              <p class="campo__ayuda" id="ayuda-foto">Seleccioná una imagen de perfil. Es obligatoria para completar el CV.</p>
+              <p class="campo__ayuda" id="foto-estado" aria-live="polite">No hay foto cargada.</p>
+              <img id="foto-form-preview" class="foto-form-preview" alt="" hidden>
+            </div>
+<div class="campo campo--ancho">
               <label for="perfil">Perfil</label>
               <textarea id="perfil" data-campo="perfil" rows="5" aria-describedby="ayuda-perfil" required></textarea>
               <p class="campo__ayuda" id="ayuda-perfil">En 3 o 4 líneas: qué hacés, qué tecnologías usás y qué buscás.</p>
@@ -101,7 +124,7 @@
         </fieldset>
 
         <!-- Experiencia + Educación -->
-        <fieldset class="seccion" id="seccion-experiencia">
+        <fieldset class="seccion" id="seccion-experiencia" data-paso="1" hidden>
           <legend>2. Experiencia y educación</legend>
 
           <h3 class="seccion__subtitulo">Experiencia laboral</h3>
@@ -118,7 +141,7 @@
         </fieldset>
 
         <!-- Habilidades -->
-        <fieldset class="seccion" id="seccion-habilidades">
+        <fieldset class="seccion" id="seccion-habilidades" data-paso="2" hidden>
           <legend>3. Habilidades</legend>
           <p class="campo__ayuda" id="ayuda-habilidades">Elegí las que manejás. Tienen que aparecer también en tus proyectos para sumar todos los puntos.</p>
           <div class="habilidades" id="lista-habilidades" role="group" aria-describedby="ayuda-habilidades"></div>
@@ -129,7 +152,7 @@
         </fieldset>
 
         <!-- Proyectos + Links -->
-        <fieldset class="seccion" id="seccion-proyectos">
+        <fieldset class="seccion" id="seccion-proyectos" data-paso="3" hidden>
           <legend>4. Proyectos y links</legend>
           <div class="lista" id="lista-proyectos" data-lista="proyectos"></div>
           <button type="button" class="boton boton--secundario" data-agregar="proyectos">+ Agregar proyecto</button>
@@ -152,9 +175,11 @@
           </div>
         </fieldset>
 
-        <div class="acciones">
-          <button type="submit" class="boton boton--primario" id="btn-criticar">Criticar mi CV</button>
-          <button type="button" class="boton boton--secundario" id="btn-pdf">Descargar PDF</button>
+        <div class="acciones acciones--pasos">
+          <button type="button" class="boton boton--secundario" id="btn-anterior" hidden>← Anterior</button>
+          <button type="button" class="boton boton--primario" id="btn-siguiente">Siguiente →</button>
+          <button type="submit" class="boton boton--primario" id="btn-criticar" hidden>Criticar mi CV</button>
+          <button type="button" class="boton boton--secundario" id="btn-pdf" hidden>Descargar PDF</button>
         </div>
       </form>
 
@@ -178,12 +203,23 @@
             </div>
           </div>
           <button type="button" class="boton boton--texto" id="btn-pdf-resultado">Descargar PDF</button>
+          <button type="button" class="boton boton--texto boton--peligro" data-nuevo-cv>Empezar un CV nuevo</button>
         </div>
       </aside>
     </section>
   </main>
 
   <!-- Plantillas de los ítems de las listas -->
+  <!-- Confirmación antes de borrar el CV guardado -->
+  <dialog id="dialogo-nuevo" class="dialogo" aria-labelledby="dialogo-nuevo-titulo" aria-describedby="dialogo-nuevo-texto">
+    <h2 id="dialogo-nuevo-titulo">¿Empezar un CV nuevo?</h2>
+    <p id="dialogo-nuevo-texto">Se borra todo lo que cargaste en este navegador y no se puede deshacer. Si querés guardarlo, descargá el PDF antes.</p>
+    <div class="acciones">
+      <button type="button" class="boton boton--secundario" id="btn-nuevo-cancelar" autofocus>Cancelar</button>
+      <button type="button" class="boton boton--peligro-solido" id="btn-nuevo-confirmar">Sí, empezar de cero</button>
+    </div>
+  </dialog>
+
   <template id="tpl-experiencias">
     <div class="item">
       <div class="campos campos--2">
@@ -224,5 +260,191 @@
   <script src="js/reglas.js"></script>
   <script src="js/critica.js"></script>
   <script src="js/formulario.js"></script>
+
+
+  <!-- Foto de perfil obligatoria: extensión de la lógica existente del formulario. -->
+  <script>
+    (() => {
+      const fotoInput = document.getElementById("foto");
+      const fotoEstado = document.getElementById("foto-estado");
+      const fotoFormPreview = document.getElementById("foto-form-preview");
+      const hojaCv = document.getElementById("cv-hoja");
+      const formCv = document.getElementById("form-cv");
+      let fotoData = (typeof cv !== "undefined" && cv.datos && cv.datos.foto) ? cv.datos.foto : "";
+
+      if (!fotoInput || !formCv || !hojaCv) return;
+
+      function guardarFotoEnCv() {
+        if (typeof cv === "undefined") return;
+        if (!cv.datos) cv.datos = {};
+        cv.datos.foto = fotoData;
+      }
+
+      function guardarFoto() {
+        guardarFotoEnCv();
+        if (typeof guardar === "function") guardar();
+      }
+
+      function actualizarEstadoFoto() {
+        if (fotoData) {
+          fotoEstado.textContent = "Foto cargada.";
+          fotoFormPreview.src = fotoData;
+          fotoFormPreview.alt = `Vista previa de la foto de ${cv.datos.nombre || "perfil"}`;
+          fotoFormPreview.hidden = false;
+        } else {
+          fotoEstado.textContent = "No hay foto cargada.";
+          fotoFormPreview.removeAttribute("src");
+          fotoFormPreview.alt = "";
+          fotoFormPreview.hidden = true;
+        }
+      }
+
+      function marcarFoto(invalida) {
+        if (typeof marcar === "function") {
+          marcar(fotoInput, invalida, "Seleccioná una foto de perfil.");
+        } else {
+          fotoInput.classList.toggle("invalido", invalida);
+          if (invalida) fotoInput.setAttribute("aria-invalid", "true");
+          else fotoInput.removeAttribute("aria-invalid");
+        }
+      }
+
+      function fotoValida() {
+        return Boolean(fotoData);
+      }
+
+      function detenerSinFoto(e) {
+        e.preventDefault();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        marcarFoto(true);
+        fotoInput.focus();
+        const errorForm = document.getElementById("error-form");
+        if (errorForm) {
+          errorForm.hidden = false;
+          errorForm.textContent = "Falta completar la foto de perfil.";
+        }
+      }
+
+      // Mantiene la foto después de que formulario.js reconstruye el objeto cv.
+      function sincronizarFotoConCv() {
+        guardarFotoEnCv();
+        actualizarEstadoFoto();
+        if (typeof guardar === "function") guardar();
+      }
+
+      // La vista previa principal es generada por formulario.js; acá agregamos la foto sin tocar su lógica.
+      if (typeof renderPreview === "function") {
+        const renderPreviewOriginal = renderPreview;
+        renderPreview = function () {
+          const resultado = renderPreviewOriginal.apply(this, arguments);
+          const cabecera = hojaCv.querySelector(".cv__cabecera");
+          if (cabecera) {
+            let contenido = cabecera.querySelector(".cv__cabecera-contenido");
+            if (!contenido) {
+              contenido = document.createElement("div");
+              contenido.className = "cv__cabecera-contenido";
+              while (cabecera.firstChild) contenido.appendChild(cabecera.firstChild);
+              cabecera.appendChild(contenido);
+            }
+
+            let datosPersonales = contenido.querySelector(".cv__datos-personales");
+            if (!datosPersonales) {
+              datosPersonales = document.createElement("div");
+              datosPersonales.className = "cv__datos-personales";
+              while (contenido.firstChild) datosPersonales.appendChild(contenido.firstChild);
+              contenido.appendChild(datosPersonales);
+            }
+
+            const fotoExistente = contenido.querySelector(".cv__foto");
+            if (fotoExistente) fotoExistente.remove();
+
+            if (fotoData) {
+              const imagen = document.createElement("img");
+              imagen.className = "cv__foto";
+              imagen.src = fotoData;
+              imagen.alt = `Foto de perfil de ${cv.datos.nombre || "la persona postulante"}`;
+              contenido.appendChild(imagen);
+            }
+          }
+          return resultado;
+        };
+      }
+
+      fotoInput.addEventListener("change", () => {
+        const archivo = fotoInput.files && fotoInput.files[0];
+        if (!archivo) return;
+
+        if (!archivo.type || !archivo.type.startsWith("image/")) {
+          fotoData = "";
+          fotoInput.value = "";
+          sincronizarFotoConCv();
+          marcarFoto(true);
+          if (typeof renderPreview === "function") renderPreview();
+          return;
+        }
+
+        const lector = new FileReader();
+        lector.addEventListener("load", () => {
+          fotoData = String(lector.result || "");
+          sincronizarFotoConCv();
+          marcarFoto(false);
+          if (typeof renderPreview === "function") renderPreview();
+        });
+        lector.readAsDataURL(archivo);
+      });
+
+      // Después de cualquier edición, formulario.js puede reconstruir cv; volvemos a colocar la foto.
+      formCv.addEventListener("input", () => {
+        guardarFotoEnCv();
+        if (typeof guardar === "function") guardar();
+      });
+      formCv.addEventListener("change", (e) => {
+        if (e.target !== fotoInput) {
+          guardarFotoEnCv();
+          if (typeof guardar === "function") guardar();
+        }
+      });
+      formCv.addEventListener("click", () => {
+        window.setTimeout(() => {
+          guardarFotoEnCv();
+          if (typeof guardar === "function") guardar();
+        }, 0);
+      });
+
+      // Antes de que formulario.js procese el avance, bloqueamos el paso 1 si no hay foto.
+      document.getElementById("btn-siguiente")?.addEventListener("click", (e) => {
+        if (typeof pasoActual !== "undefined" && pasoActual === 0 && !fotoValida()) {
+          detenerSinFoto(e);
+        }
+      }, true);
+
+      // También se bloquea "Criticar mi CV" o Enter si la foto falta.
+      formCv.addEventListener("submit", (e) => {
+        guardarFotoEnCv();
+        if (!fotoValida()) detenerSinFoto(e);
+      }, true);
+
+      document.getElementById("btn-pdf")?.addEventListener("click", (e) => {
+        if (!fotoValida()) detenerSinFoto(e);
+      }, true);
+
+      document.getElementById("btn-pdf-resultado")?.addEventListener("click", (e) => {
+        if (!fotoValida()) detenerSinFoto(e);
+      }, true);
+
+      // "Empezar un CV nuevo" debe borrar también la foto almacenada en memoria.
+      document.getElementById("btn-nuevo-confirmar")?.addEventListener("click", () => {
+        window.setTimeout(() => {
+          fotoData = "";
+          fotoInput.value = "";
+          actualizarEstadoFoto();
+          if (typeof renderPreview === "function") renderPreview();
+        }, 0);
+      });
+
+      actualizarEstadoFoto();
+      if (typeof renderPreview === "function") renderPreview();
+    })();
+  </script>
 </body>
 </html>

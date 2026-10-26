@@ -10,6 +10,7 @@
   --color-fondo: #FFFFFF;
   --color-superficie: #F9FAFB;
   --color-error: #DC2626;
+  --color-error-hover: #B91C1C;
 
   --rojo-fondo: #FEE2E2;
   --rojo-texto: #991B1B;
@@ -142,6 +143,15 @@ a { color: var(--color-acento); }
   color: var(--color-error);
 }
 
+.boton--peligro-solido {
+  background: var(--color-error);
+  color: #FFFFFF;
+}
+
+.boton--peligro-solido:hover {
+  background: var(--color-error-hover);
+}
+
 /* ---------- Landing y elegir área ---------- */
 
 .landing,
@@ -240,6 +250,7 @@ a { color: var(--color-acento); }
 
 .form-barra {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   margin-bottom: var(--espacio);
@@ -247,6 +258,145 @@ a { color: var(--color-acento); }
 
 .form-barra p {
   margin: 0;
+}
+
+.form-barra__nuevo {
+  margin-left: auto;
+}
+
+.landing__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* ---------- Diálogo de confirmación ---------- */
+
+.dialogo {
+  width: calc(100% - 32px);
+  max-width: 440px;
+  padding: 24px;
+  border: 0;
+  border-radius: var(--radio);
+  box-shadow: 0 10px 40px rgba(17, 24, 39, 0.25);
+  color: var(--color-texto);
+}
+
+.dialogo::backdrop {
+  background: rgba(17, 24, 39, 0.45);
+}
+
+.dialogo h2 {
+  font-size: 20px;
+}
+
+.dialogo p {
+  color: var(--color-texto-suave);
+}
+
+.dialogo .acciones {
+  justify-content: flex-end;
+}
+
+/* ---------- Barra de pasos ---------- */
+
+.pasos ol {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.pasos li {
+  position: relative;
+}
+
+/* Línea que une cada número con el anterior. */
+.pasos li + li::before {
+  content: "";
+  position: absolute;
+  top: 25px;
+  right: calc(50% + 22px);
+  left: calc(-50% + 22px);
+  height: 2px;
+  background: var(--color-borde);
+}
+
+.pasos li:has(.paso-boton:not(:disabled)) + li:has(.paso-boton:not(:disabled))::before {
+  background: var(--color-acento);
+}
+
+.paso-boton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 2px;
+  border: 0;
+  border-radius: var(--radio);
+  background: none;
+  color: var(--color-texto-suave);
+  font: inherit;
+  cursor: pointer;
+}
+
+.paso-boton__numero {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--color-borde);
+  border-radius: 50%;
+  background: var(--color-fondo);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.paso-boton__nombre {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.paso-boton:hover:not(:disabled) .paso-boton__numero {
+  border-color: var(--color-acento);
+}
+
+.paso-boton--completo .paso-boton__numero {
+  border-color: var(--color-acento);
+  background: var(--color-acento-suave);
+  color: var(--color-acento-hover);
+}
+
+.paso-boton[aria-current="step"] {
+  color: var(--color-acento-hover);
+}
+
+.paso-boton[aria-current="step"] .paso-boton__numero {
+  border-color: var(--color-acento);
+  background: var(--color-acento);
+  color: #FFFFFF;
+}
+
+.paso-boton[aria-current="step"] .paso-boton__nombre {
+  font-weight: 600;
+}
+
+.paso-boton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Anterior a la izquierda; Siguiente / Criticar a la derecha. */
+.acciones--pasos {
+  justify-content: flex-end;
+}
+
+.acciones--pasos #btn-anterior {
+  margin-right: auto;
 }
 
 .seccion {
@@ -311,6 +461,7 @@ input[type="email"],
 input[type="tel"],
 input[type="url"],
 input[type="month"],
+input[type="file"],
 textarea,
 select {
   width: 100%;
@@ -329,14 +480,20 @@ textarea {
 
 input:focus-visible,
 textarea:focus-visible,
-select:focus-visible {
+select:focus-visible,
+input[type="month"]:focus-within {  /* con el foco en la parte del año, el campo deja de ser :focus */
   outline: 2px solid var(--color-acento);
   outline-offset: 0;
   border-color: var(--color-acento);
 }
 
-.invalido,
-.invalido:focus-visible {
+/* Con tipo de elemento para ganarle a input[type="..."] en especificidad. */
+input.invalido,
+textarea.invalido,
+select.invalido,
+input.invalido:focus-visible,
+textarea.invalido:focus-visible,
+input[type="month"].invalido:focus-within {
   border-color: var(--color-error);
   outline-color: var(--color-error);
 }
@@ -345,6 +502,13 @@ select:focus-visible {
   padding: 8px;
   border: 2px solid var(--color-error);
   border-radius: var(--radio);
+}
+
+.campo__error {
+  margin: 0;
+  color: var(--color-error);
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .mensaje-error {
@@ -464,6 +628,35 @@ select:focus-visible {
   border-bottom: 2px solid var(--color-acento);
 }
 
+.cv__cabecera-contenido {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.cv__datos-personales {
+  flex: 1;
+  min-width: 0;
+}
+
+.cv__foto {
+  flex: 0 0 96px;
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border: 1px solid var(--color-borde);
+  border-radius: 50%;
+}
+
+.foto-form-preview {
+  width: 96px;
+  height: 96px;
+  margin-top: 8px;
+  object-fit: cover;
+  border: 1px solid var(--color-borde);
+  border-radius: 50%;
+}
+
 .cv__nombre {
   margin: 0;
   font-size: 26px;
@@ -482,7 +675,7 @@ select:focus-visible {
 }
 
 .cv__vacio {
-  color: #9CA3AF;
+  color: #6B7280;  /* 4.8:1 sobre blanco */
 }
 
 .cv__bloque {
@@ -608,6 +801,16 @@ select:focus-visible {
   font-size: 14px;
 }
 
+.mejora__detalles {
+  margin: 6px 0 4px;
+  padding-left: 18px;
+  font-size: 14px;
+}
+
+.mejora__detalles li {
+  margin-bottom: 2px;
+}
+
 .felicitacion {
   padding: 12px var(--espacio);
   border-radius: var(--radio);
@@ -651,8 +854,24 @@ select:focus-visible {
     padding: 20px;
   }
 
+  .cv__cabecera-contenido {
+    gap: 12px;
+  }
+
+  .cv__foto {
+    flex-basis: 80px;
+    width: 80px;
+    height: 80px;
+  }
+
   .acciones .boton {
     flex: 1 1 100%;
+  }
+
+  .acciones--pasos #btn-anterior,
+  .acciones--pasos #btn-siguiente {
+    flex: 1 1 0;
+    margin-right: 0;
   }
 }
 
