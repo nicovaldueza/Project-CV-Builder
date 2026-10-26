@@ -143,5 +143,5 @@ Estados: `[ ]` pendiente · `[~]` en progreso · `[x]` completada · `[!]` bloqu
 - [x] 360 px.
 - [~] Registrar resultados en `testing.md`.
 - [x] Verificar `index.html` en raíz.
-- [ ] Hacer público el repo (en el plan Free, Pages no funciona con repos privados). **Límite: sábado 24/10.**
-- [ ] Activar GitHub Pages y verificar rutas y consola en la URL publicada. **Límite: sábado 24/10.**
+- [x] Hacer público el repo (en el plan Free, Pages no funciona con repos privados). Hecho el 26/10.
+- [x] Activar GitHub Pages y verificar rutas y consola en la URL publicada: https://nicovaldueza.github.io/Project-CV-Builder/
